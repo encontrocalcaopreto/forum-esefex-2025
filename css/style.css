@@ -415,10 +415,11 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 .hero__subtitle {
   margin-top: 1.5rem;
   font-size: clamp(.95rem, 2vw, 1.15rem);
-  color: var(--text-dim);
+  color: rgba(240, 235, 228, .85);
   max-width: 640px;
   margin-inline: auto;
   line-height: 1.7;
+  text-shadow: 0 1px 6px rgba(0,0,0,.5);
   animation: fadeSlideDown .7s .28s ease both;
 }
 .hero__meta {
@@ -437,7 +438,8 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   font-size: .85rem;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: rgba(240, 235, 228, .8);
+  text-shadow: 0 1px 6px rgba(0,0,0,.5);
 }
 .hero__meta-item svg { width: 16px; height: 16px; color: var(--fire); }
 
@@ -1564,7 +1566,8 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   .submissao-banner__desc { max-width: 100%; }
 
   .facilidades__bloco-body { grid-template-columns: 1fr; }
-  .facilidades__mapa { border-right: none; border-bottom: 1px solid var(--border); max-height: 260px; overflow: hidden; }
+  .facilidades__mapa { border-right: none; border-bottom: 1px solid var(--border); }
+  .facilidades__mapa img { height: auto; object-fit: contain; }
 
   .contato__form-wrap { padding: 1.75rem 1.5rem; }
 
