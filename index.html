@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XIII Fórum Científico da EsEFEx — Ambientes Extremos</title>
+  <meta name="description" content="XIII Fórum Científico da EsEFEx — Ambientes Extremos no Esporte e no Desempenho Operacional. 11 e 12 de junho de 2026, Rio de Janeiro." />
+  <link rel="icon" type="image/png" href="../Logo esefex.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════════ -->
+  <header class="navbar" id="navbar">
+    <div class="navbar__inner container">
+      <a href="#hero" class="navbar__brand">
+        <img src="../Logo esefex.png" alt="Logo EsEFEx" class="navbar__logo" />
+        <span class="navbar__title">XIII Fórum Científico</span>
+      </a>
+      <nav class="navbar__nav" id="navMenu">
+        <a href="#sobre" class="navbar__link">Sobre</a>
+        <a href="submissao.html" target="_blank" rel="noopener" class="navbar__link">Submissão</a>
+        <a href="#palestrantes" class="navbar__link">Palestrantes</a>
+        <a href="#programacao" class="navbar__link">Programação</a>
+        <div class="navbar__dropdown" id="navDropdown">
+          <button class="navbar__link navbar__dropdown-trigger" id="navDropdownTrigger" aria-expanded="false">
+            Mais
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="navbar__dropdown-menu" id="navDropdownMenu">
+            <a href="#eixos" class="navbar__dropdown-item">Eixos Temáticos</a>
+            <a href="submissao.html" target="_blank" rel="noopener" class="navbar__dropdown-item">Submissão de Trabalhos ↗</a>
+            <a href="#parceiros" class="navbar__dropdown-item">Parceiros</a>
+            <a href="#facilidades" class="navbar__dropdown-item">Facilidades</a>
+            <a href="#contato" class="navbar__dropdown-item">Contato</a>
+          </div>
+        </div>
+        <a href="https://www.sympla.com.br/evento/xiii-forum-cientifico-da-esefex-2026/3367486" target="_blank" rel="noopener" class="navbar__cta">Inscreva-se</a>
+      </nav>
+      <button class="navbar__hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <div class="hero__bg">
+      <div class="hero__grid"></div>
+      <div class="hero__particles" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="hero__content container">
+      <div class="hero__badge">EsEFEx · Rio de Janeiro</div>
+      <h1 class="hero__title">
+        XIII FÓRUM<br />
+        <span class="hero__title--accent">CIENTÍFICO</span><br />
+        DA EsEFEx
+      </h1>
+      <p class="hero__subtitle">
+        Ambientes Extremos no Esporte<br class="hero__br" />
+        e no Desempenho Operacional
+      </p>
+      <div class="hero__meta">
+        <div class="hero__meta-item">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>11 e 12 Jun · 2026</span>
+        </div>
+        <div class="hero__meta-item">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Escola de Educação Física do Exército</span>
+        </div>
+      </div>
+      <div class="countdown" id="countdown" aria-label="Contagem regressiva">
+        <div class="countdown__item">
+          <span class="countdown__num" id="cd-days">--</span>
+          <span class="countdown__label">Dias</span>
+        </div>
+        <div class="countdown__sep">:</div>
+        <div class="countdown__item">
+          <span class="countdown__num" id="cd-hours">--</span>
+          <span class="countdown__label">Horas</span>
+        </div>
+        <div class="countdown__sep">:</div>
+        <div class="countdown__item">
+          <span class="countdown__num" id="cd-mins">--</span>
+          <span class="countdown__label">Min</span>
+        </div>
+        <div class="countdown__sep">:</div>
+        <div class="countdown__item">
+          <span class="countdown__num" id="cd-secs">--</span>
+          <span class="countdown__label">Seg</span>
+        </div>
+      </div>
+      <div class="hero__actions">
+        <a href="#programacao" class="btn btn--outline">Ver Programação</a>
+        <a href="https://www.sympla.com.br/evento/xiii-forum-cientifico-da-esefex-2026/3367486" target="_blank" rel="noopener" class="btn btn--primary">Inscreva-se</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SOBRE
+  ═══════════════════════════════════════════ -->
+  <section class="sobre" id="sobre">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Sobre o Evento</span>
+        <h2 class="section-title">O Fórum</h2>
+      </div>
+      <div class="sobre__grid">
+        <div class="sobre__text fade-in">
+          <p>
+            O <strong>XIII Fórum Científico da EsEFEx</strong> reúne pesquisadores, militares,
+            atletas de elite e profissionais de saúde e esporte para debater os limites do
+            desempenho humano em <strong>ambientes extremos</strong> — do calor intenso ao frio
+            ártico, das profundezas submarinas às altitudes elevadas.
+          </p>
+          <p>
+            Com 15 palestrantes nacionais de renome, distribuídos em <strong>5 eixos temáticos</strong>,
+            o evento integra ciência, operações militares e esporte de alto rendimento numa
+            programação de dois dias que inclui palestras, mesas-redondas, apresentação de
+            pôsteres e uma <strong>atividade prática de HYROX</strong>.
+          </p>
+          <p>
+            Nesta 13ª edição, a EsEFEx consolida-se como referência na interface entre
+            <strong>fisiologia do exercício</strong>, <strong>medicina esportiva</strong> e
+            <strong>preparo operacional</strong>, discutindo desde a nutrição em condições
+            extremas até o desempenho de atletas olímpicos de esportes de inverno.
+          </p>
+        </div>
+        <div class="sobre__stats">
+          <div class="stat-card fade-in">
+            <div class="stat-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="stat-card__num">15+</div>
+            <div class="stat-card__label">Palestrantes</div>
+          </div>
+          <div class="stat-card fade-in">
+            <div class="stat-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="stat-card__num">2</div>
+            <div class="stat-card__label">Dias de Evento</div>
+          </div>
+          <div class="stat-card fade-in">
+            <div class="stat-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="stat-card__num">5</div>
+            <div class="stat-card__label">Eixos Temáticos</div>
+          </div>
+        </div>
+      </div>
+      <div class="sobre__cta fade-in">
+        <a href="submissao.html" target="_blank" rel="noopener" class="sobre__submissao-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Submissão de Trabalhos
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       EIXOS TEMÁTICOS
+  ═══════════════════════════════════════════ -->
+  <section class="eixos" id="eixos">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Temas</span>
+        <h2 class="section-title">Eixos Temáticos</h2>
+        <p class="section-subtitle">Cinco perspectivas integradas sobre o desempenho humano em ambientes extremos</p>
+      </div>
+      <div class="eixos-grid">
+
+        <div class="eixo-card fade-in" data-eixo="1">
+          <div class="eixo-card__num">01</div>
+          <div class="eixo-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0110 10c0 5.52-4.48 10-10 10S2 17.52 2 12"/><path d="M12 6v6l4 2"/><circle cx="19" cy="5" r="2"/></svg>
+          </div>
+          <h3 class="eixo-card__title">Fisiologia do Desempenho em Ambientes Extremos</h3>
+          <p class="eixo-card__desc">Calor, frio, altitude e clima: impactos fisiológicos, bioquímicos e hormonais no organismo humano</p>
+        </div>
+
+        <div class="eixo-card fade-in" data-eixo="2">
+          <div class="eixo-card__num">02</div>
+          <div class="eixo-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 class="eixo-card__title">Militar e Operacional</h3>
+          <p class="eixo-card__desc">Do submarino ao ambiente tático: desempenho operacional, hipertermia e preparo do militar em condições adversas</p>
+        </div>
+
+        <div class="eixo-card fade-in" data-eixo="3">
+          <div class="eixo-card__num">03</div>
+          <div class="eixo-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3 class="eixo-card__title">Esporte de Alto Rendimento em Condições Extremas</h3>
+          <p class="eixo-card__desc">Atletas olímpicos de esportes de inverno, IRONMAN e altitude: estratégias de performance e gestão de risco</p>
+        </div>
+
+        <div class="eixo-card fade-in" data-eixo="4">
+          <div class="eixo-card__num">04</div>
+          <div class="eixo-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11M6.5 17.5h11M4 12h16"/><circle cx="4" cy="6.5" r="2"/><circle cx="4" cy="17.5" r="2"/><circle cx="20" cy="6.5" r="2"/><circle cx="20" cy="17.5" r="2"/></svg>
+          </div>
+          <h3 class="eixo-card__title">Treinamento de Força para Alta Performance</h3>
+          <p class="eixo-card__desc">Métodos de treinamento, LPO e abordagem biomecânica e fisiológica do treinamento de força</p>
+        </div>
+
+        <div class="eixo-card fade-in" data-eixo="5">
+          <div class="eixo-card__num">05</div>
+          <div class="eixo-card__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 000 20M2 12h20"/></svg>
+          </div>
+          <h3 class="eixo-card__title">Futebol: Desempenho em Ano de Copa</h3>
+          <p class="eixo-card__desc">Planejamento científico no futebol profissional, medicina esportiva e a mulher no futebol</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PALESTRANTES
+  ═══════════════════════════════════════════ -->
+  <section class="palestrantes" id="palestrantes">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Convidados</span>
+        <h2 class="section-title">Palestrantes</h2>
+        <p class="section-subtitle">Especialistas nacionais em fisiologia, medicina esportiva, treinamento militar e alto rendimento</p>
+      </div>
+
+      <!-- EIXO 1 -->
+      <div class="speakers-eixo-label fade-in">
+        <span class="eixo-badge eixo-badge--1">Eixo 01</span>
+        Fisiologia do Desempenho em Ambientes Extremos
+      </div>
+      <div class="speakers-grid">
+
+        <article class="speaker-card fade-in" data-speaker="samuel-wanner">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Dr. Samuel Wanner (UFMG)/Foto - Samuel Penna Wanner (eventos).jpg"
+                 alt="Prof. Dr. Samuel Wanner" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Prof. Dr. Samuel Wanner</h3>
+            <p class="speaker-card__inst">UFMG</p>
+            <p class="speaker-card__topic">Futebol e Calor Extremo: Efeito das Condições Ambientais Sobre o Desempenho Físico</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="thiago-mendes">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Dr. Thiago Mendes (UFBA)/Foto perfil Thiago Mendes.jpeg"
+                 alt="Prof. Dr. Thiago Mendes" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Prof. Dr. Thiago Mendes</h3>
+            <p class="speaker-card__inst">UFBA</p>
+            <p class="speaker-card__topic">Efeitos do Ambiente Ice nos Aspectos de Saúde e Desempenho Físico e Operacional</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="andreia-naves">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Esp. Andreia Naves (SP)/WhatsApp Image 2026-03-10 at 11.28.43.jpeg"
+                 alt="Profa. Esp. Andreia Naves" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Profa. Esp. Andreia Naves</h3>
+            <p class="speaker-card__inst">SP</p>
+            <p class="speaker-card__topic">Nutrição para Esportes em Ambientes Extremos</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="veronica-salerno">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Profa. Dra. Veronica Salerno (UFRJ)/WhatsApp Image 2026-03-05 at 10.12.47.jpeg"
+                 alt="Profa. Dra. Verônica Salerno" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Profa. Dra. Verônica Salerno</h3>
+            <p class="speaker-card__inst">UFRJ</p>
+            <p class="speaker-card__topic">Impactos Bioquímicos e Hormonais de um Treinamento Militar em Clima Quente e Úmido</p>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- EIXO 2 -->
+      <div class="speakers-eixo-label fade-in">
+        <span class="eixo-badge eixo-badge--2">Eixo 02</span>
+        Militar e Operacional
+      </div>
+      <div class="speakers-grid">
+
+        <article class="speaker-card fade-in" data-speaker="valeria-faria">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 2_ Militar e Operacional/Capitão de Corveta (RM3-T) Valéria Faria/foto.jpeg"
+                 alt="CC Valéria Faria" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">CC (RM3-T) Valéria Faria</h3>
+            <p class="speaker-card__inst">CEFAN — Marinha do Brasil</p>
+            <p class="speaker-card__topic">Do Submarino ao Gelo: Desempenho Militar em Ambientes Extremos</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="maj-barros">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 2_ Militar e Operacional/Maj Barros (CBMERJ)/IMG_8080.jpg"
+                 alt="Maj Thiago de Barros Ramos" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Maj Thiago de Barros Ramos</h3>
+            <p class="speaker-card__inst">CBMERJ</p>
+            <p class="speaker-card__topic">Hipertermia Maligna em Ambiente Tático: Diagnóstico e Ação em Tempo Crítico</p>
+          </div>
+        </article>
+
+
+
+      </div>
+
+      <!-- EIXO 3 -->
+      <div class="speakers-eixo-label fade-in">
+        <span class="eixo-badge eixo-badge--3">Eixo 03</span>
+        Esporte de Alto Rendimento em Condições Extremas
+      </div>
+      <div class="speakers-grid">
+
+        <article class="speaker-card fade-in" data-speaker="bindialatti">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 3_ Esporte de Alto Rendimento em Condições Extremas/Atleta Edson Luques Bindialatti (OLY)/Oly.jpeg"
+                 alt="Edson Luques Bindialatti" loading="lazy">
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Edson Luques Bindialatti</h3>
+            <p class="speaker-card__inst">Atleta Olímpico — SP</p>
+            <p class="speaker-card__topic">Performance no Frio: Estratégias para Atletas de Alto Rendimento em Esportes de Inverno</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="leandro-gregorut">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 3_ Esporte de Alto Rendimento em Condições Extremas/Dr. Leandro Gregorut (IRONMAN)/WhatsApp Image 2026-03-09 at 22.54.19.jpeg"
+                 alt="Dr. Leandro Gregorut Lima" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Dr. Leandro Gregorut Lima</h3>
+            <p class="speaker-card__inst">IRONMAN Brasil — SP</p>
+            <p class="speaker-card__topic">Emergências Fisiológicas e Gestão de Risco nas Provas do IRONMAN Brasil</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="danielli-mello">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 3_ Esporte de Alto Rendimento em Condições Extremas/Profa. Dra. Danielli Mello/Dani Mello 2.jpg"
+                 alt="Profa. Dra. Danielli Mello" class="speaker-card__img" loading="lazy">
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Profa. Dra. Danielli Mello</h3>
+            <p class="speaker-card__inst">—</p>
+            <p class="speaker-card__topic">Esporte de Alto Rendimento em Condições Extremas</p>
+          </div>
+        </article>
+
+
+      </div>
+
+      <!-- EIXO 4 -->
+      <div class="speakers-eixo-label fade-in">
+        <span class="eixo-badge eixo-badge--4">Eixo 04</span>
+        Treinamento de Força para Alta Performance
+      </div>
+      <div class="speakers-grid">
+
+        <article class="speaker-card fade-in" data-speaker="alex-souto">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 4_ Treinamento de força para alta performance/Prof. Dr. Alex Souto Maior/WhatsApp Image 2026-03-01 at 16.13.28.jpeg"
+                 alt="Prof. Dr. Alex Souto Maior" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Prof. Dr. Alex Souto Maior</h3>
+            <p class="speaker-card__inst">RJ</p>
+            <p class="speaker-card__topic">Treino de Força e Criança: Um Olhar Biomecânico e Fisiológico</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="belmiro-salles">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 4_ Treinamento de força para alta performance/Prof. Dr. Belmiro de Salles_/belmiro.webp"
+                 alt="Prof. Dr. Belmiro de Salles" class="speaker-card__img" loading="lazy">
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Prof. Dr. Belmiro de Salles</h3>
+            <p class="speaker-card__inst">UFRJ — RJ</p>
+            <p class="speaker-card__topic">Métodos de Treinamento de Força</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="grazzi-favarato">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 4_ Treinamento de força para alta performance/Profa. Esp. Grazzi Favarato/WhatsApp Image 2026-03-10 at 16.00.50.jpeg"
+                 alt="Profa. Esp. Grazzi Favarato" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Profa. Esp. Grazzi Favarato</h3>
+            <p class="speaker-card__inst">Assoc. Desportiva Centro Olímpico — SP</p>
+            <p class="speaker-card__topic">LPO: Benefícios na Utilização Dentro da Preparação Física</p>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- EIXO 5 -->
+      <div class="speakers-eixo-label fade-in">
+        <span class="eixo-badge eixo-badge--5">Eixo 05</span>
+        Futebol: Desempenho em Ano de Copa
+      </div>
+      <div class="speakers-grid">
+
+        <article class="speaker-card fade-in" data-speaker="fernando-torres">
+          <div class="speaker-card__img-wrap">
+            <img src="Documentos/Eixo 5_ Futebol_ Desempenho em Ano de Copa/Dr. Fernando Torres/WhatsApp Image 2026-03-09 at 15.51.15.jpeg"
+                 alt="Dr. Fernando Torres" class="speaker-card__img" loading="lazy" />
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Dr. Fernando Torres</h3>
+            <p class="speaker-card__inst">Presidente SBMEE — SPFC — SP</p>
+            <p class="speaker-card__topic">Medicina do Esporte no Futebol</p>
+          </div>
+        </article>
+
+        <article class="speaker-card fade-in" data-speaker="daniel-goncalves">
+          <div class="speaker-card__img-wrap speaker-card__img-wrap--placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="speaker-card__body">
+            <h3 class="speaker-card__name">Prof. Ms. Daniel Gonçalves</h3>
+            <p class="speaker-card__inst">Palmeiras — SP</p>
+            <p class="speaker-card__topic">Planejamento Científico do Alto Rendimento no Futebol Profissional</p>
+          </div>
+        </article>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PROGRAMAÇÃO
+  ═══════════════════════════════════════════ -->
+  <section class="programacao" id="programacao">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Grade</span>
+        <h2 class="section-title">Programação</h2>
+        <p class="section-subtitle">11 e 12 de junho de 2026 — Escola de Educação Física do Exército, <span style="white-space:nowrap">Rio de Janeiro</span></p>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab tab--active" role="tab" aria-selected="true" aria-controls="dia1" id="tab-dia1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Dia 1 — 11 Jun
+        </button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="dia2" id="tab-dia2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Dia 2 — 12 Jun
+        </button>
+      </div>
+
+      <!-- DIA 1 -->
+      <div class="tab-panel tab-panel--active" id="dia1" role="tabpanel" aria-labelledby="tab-dia1">
+        <div class="timeline">
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">07:30</div>
+            <div class="timeline__dot timeline__dot--break"></div>
+            <div class="timeline__card timeline__card--break">
+              <span class="timeline__tag timeline__tag--break">Credenciamento</span>
+              <h3 class="timeline__title">Credenciamento e Distribuição de Materiais</h3>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">08:30</div>
+            <div class="timeline__dot timeline__dot--special"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag timeline__tag--special">Abertura</span>
+              <h3 class="timeline__title">Cerimônia de Abertura do XIII Fórum Científico</h3>
+              <p class="timeline__speaker">TC Bottrel — Comandante da EsEFEx</p>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">08:45</div>
+            <div class="timeline__dot timeline__dot--special"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag timeline__tag--special">Palestra de Abertura</span>
+              <h3 class="timeline__title">Planeta Extremo</h3>
+              <p class="timeline__speaker">Carol Barcelos / Cleyton Conservani</p>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">09:25</div>
+            <div class="timeline__dot timeline__dot--break"></div>
+            <div class="timeline__card timeline__card--break">
+              <span class="timeline__tag timeline__tag--break">Intervalo</span>
+              <h3 class="timeline__title">Intervalo</h3>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">09:50</div>
+            <div class="timeline__dot eixo-dot--1"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag eixo-tag--1">Eixo 01 — Fisiologia em Ambientes Extremos</span>
+              <h3 class="timeline__title">Mesa-Redonda: Fisiologia do Desempenho em Ambientes Extremos</h3>
+              <ul class="timeline__list">
+                <li><strong>Prof. Dr. Thiago Mendes (UFBA)</strong> — Efeitos do Ambiente Ice nos Aspectos de Saúde e Desempenho Físico e Operacional</li>
+                <li><strong>Profa. Dra. Verônica Salerno (UFRJ)</strong> — Impactos Bioquímicos e Hormonais de um Treinamento Militar em Clima Quente e Úmido</li>
+                <li><strong>Prof. Dr. Samuel Wanner (UFMG)</strong> — Futebol e Calor Extremo: Efeito das Condições Ambientais Sobre o Desempenho Físico</li>
+                <li><strong>Profa. Esp. Andreia Naves (SP)</strong> — Nutrição para Esportes em Ambientes Extremos</li>
+              </ul>
+              <p class="timeline__mod">Debate: 11:10 · Moderadora: Profa. Dra. Miriam Mainenti (EsEFEx)</p>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">11:30</div>
+            <div class="timeline__dot timeline__dot--break"></div>
+            <div class="timeline__card timeline__card--break">
+              <span class="timeline__tag timeline__tag--break">Almoço</span>
+              <h3 class="timeline__title">Almoço</h3>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">13:00</div>
+            <div class="timeline__dot eixo-dot--2"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag eixo-tag--2">Eixo 02 — Militar e Operacional</span>
+              <h3 class="timeline__title">Mesa-Redonda: Desempenho Militar em Ambientes Extremos</h3>
+              <ul class="timeline__list">
+<li><strong>CC (RM3-T) Valéria Faria (CEFAN/MB)</strong> — Do Submarino ao Gelo: Desempenho Militar em Ambientes Extremos</li>
+                <li><strong>Maj Bandeira (IPCFEx)</strong></li>
+                <li><strong>Maj Thiago de Barros Ramos (CBMERJ)</strong> — Hipertermia Maligna em Ambiente Tático: Diagnóstico e Ação em Tempo Crítico</li>
+              </ul>
+              <p class="timeline__mod">Debate: 14:15 · Moderadora: Cap Paula Fernandes (IPCFEx)</p>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">14:35</div>
+            <div class="timeline__dot timeline__dot--break"></div>
+            <div class="timeline__card timeline__card--break">
+              <span class="timeline__tag timeline__tag--break">Intervalo</span>
+              <h3 class="timeline__title">Coffee Break + Apresentação de Pôsteres + Avaliação de Temas Livres</h3>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">15:20</div>
+            <div class="timeline__dot eixo-dot--3"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag eixo-tag--3">Eixo 03 — Alto Rendimento em Condições Extremas</span>
+              <h3 class="timeline__title">Mesa-Redonda: Esporte de Alto Rendimento em Condições Extremas</h3>
+              <ul class="timeline__list">
+                <li><strong>Edson Luques Bindialatti — Atleta Olímpico (SP)</strong> — Performance no Frio: Estratégias para Atletas de Alto Rendimento em Esportes de Inverno</li>
+                <li><strong>Profa. Dra. Danielli Mello</strong> — Esporte de Alto Rendimento em Condições Extremas</li>
+                <li><strong>Dr. Leandro Gregorut Lima (SP)</strong> — Emergências Fisiológicas e Gestão de Risco nas Provas do IRONMAN Brasil</li>
+              </ul>
+              <p class="timeline__mod">Debate: 16:20 · Moderador: TC Pierre (EsEFEx)</p>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">16:50</div>
+            <div class="timeline__dot timeline__dot--special"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag timeline__tag--special">Atividade Prática</span>
+              <h3 class="timeline__title">HYROX — Atividade Prática</h3>
+              <p class="timeline__speaker">Prof. Alexandre Gurgel · Apoio médico: Ambulância SAFE</p>
+              <p class="timeline__mod">Até 18:20</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DIA 2 -->
+      <div class="tab-panel" id="dia2" role="tabpanel" aria-labelledby="tab-dia2" hidden>
+        <div class="timeline">
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">07:30</div>
+            <div class="timeline__dot timeline__dot--break"></div>
+            <div class="timeline__card timeline__card--break">
+              <span class="timeline__tag timeline__tag--break">Credenciamento</span>
+              <h3 class="timeline__title">Credenciamento e Distribuição de Materiais</h3>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">08:30</div>
+            <div class="timeline__dot eixo-dot--4"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag eixo-tag--4">Eixo 04 — Treinamento de Força</span>
+              <h3 class="timeline__title">Mesa-Redonda: Treinamento de Força para Alta Performance</h3>
+              <ul class="timeline__list">
+                <li><strong>Prof. Dr. Belmiro de Salles (RJ)</strong> — Métodos de Treinamento</li>
+                <li><strong>Prof. Dr. Alex Souto Maior (RJ)</strong> — Treino de Força e Criança: Um Olhar Biomecânico e Fisiológico</li>
+                <li><strong>Profa. Esp. Grazzi Favarato (SP)</strong> — LPO: Benefícios na Utilização Dentro da Preparação Física</li>
+              </ul>
+              <p class="timeline__mod">Debate: 09:30 · Moderadora: Profa. Dra. Cláudia (EsEFEx)</p>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">09:50</div>
+            <div class="timeline__dot timeline__dot--break"></div>
+            <div class="timeline__card timeline__card--break">
+              <span class="timeline__tag timeline__tag--break">Intervalo</span>
+              <h3 class="timeline__title">Coffee Break + Apresentação de Pôsteres</h3>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">10:35</div>
+            <div class="timeline__dot eixo-dot--5"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag eixo-tag--5">Eixo 05 — Futebol em Ano de Copa</span>
+              <h3 class="timeline__title">Mesa-Redonda: Futebol — Desempenho em Ano de Copa</h3>
+              <ul class="timeline__list">
+                <li><strong>Prof. Ms. Daniel Gonçalves (Palmeiras — SP)</strong> — Planejamento Científico do Alto Rendimento no Futebol Profissional</li>
+                <li><strong>Dr. Fernando Torres (Presidente SBMEE — SPFC — SP)</strong> — Medicina do Esporte no Futebol</li>
+                <li><strong>A Confirmar</strong> — Mulher no Futebol</li>
+              </ul>
+              <p class="timeline__mod">Debate: 11:35 · Moderador: Maj Mauro (EsEFEx)</p>
+            </div>
+          </div>
+
+          <div class="timeline__item fade-in">
+            <div class="timeline__time">12:15</div>
+            <div class="timeline__dot timeline__dot--special"></div>
+            <div class="timeline__card">
+              <span class="timeline__tag timeline__tag--special">Encerramento</span>
+              <h3 class="timeline__title">Cerimônia de Encerramento do XIII Fórum Científico</h3>
+              <p class="timeline__speaker">TC Bottrel · Profa. Dra. Danielli Mello</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       INSCRIÇÕES
+  ═══════════════════════════════════════════ -->
+  <section class="inscricoes" id="inscricoes">
+    <div class="container">
+      <div class="inscricoes__inner fade-in">
+        <div class="inscricoes__text">
+          <h2 class="inscricoes__title">Garanta sua Vaga</h2>
+          <p class="inscricoes__desc">
+            As inscrições estão abertas! Garanta sua vaga pelo Sympla.
+            Evento gratuito para militares e estudantes.
+          </p>
+        </div>
+        <a href="https://www.sympla.com.br/evento/xiii-forum-cientifico-da-esefex-2026/3367486" target="_blank" rel="noopener" class="btn btn--primary btn--lg">
+          Inscreva-se agora
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SUBMISSÃO
+  ═══════════════════════════════════════════ -->
+  <section class="submissao-banner" id="submissao">
+    <div class="container">
+      <div class="submissao-banner__inner fade-in">
+        <div class="submissao-banner__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="submissao-banner__text">
+          <h2 class="submissao-banner__title">Submissão de Trabalhos</h2>
+          <p class="submissao-banner__desc">Baixe o template, submeta seu resumo pelo formulário e acompanhe os trabalhos aprovados e a lista de pôsteres.</p>
+        </div>
+        <a href="submissao.html" target="_blank" rel="noopener" class="btn btn--primary">
+          Acessar Portal
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       PARCEIROS
+  ═══════════════════════════════════════════ -->
+  <section class="parceiros" id="parceiros">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Apoio</span>
+        <h2 class="section-title">Parceiros</h2>
+        <p class="section-subtitle">Organizações que apoiam o XIII Fórum Científico da EsEFEx</p>
+      </div>
+      <div class="parceiros-grid fade-in">
+
+        <div class="parceiro-card">
+          <img src="Documentos/Parceiros/poliscan.png" alt="Poliscan Termografia Clínica">
+        </div>
+
+        <div class="parceiro-card">
+          <img src="Documentos/Parceiros/thermocracy.png" alt="Thermocracy">
+        </div>
+
+        <div class="parceiro-card">
+          <img src="Documentos/Imagens/kovalent.jpeg" alt="Grupo Kovalent Esportes">
+        </div>
+
+        <div class="parceiro-card">
+          <img src="Documentos/Imagens/liquidz.jpeg" alt="Liquidz">
+        </div>
+
+        <div class="parceiro-card">
+          <img src="Documentos/Imagens/advanced.jpeg" alt="Advanced Recovery for Athletes">
+        </div>
+
+        <div class="parceiro-card">
+          <img src="Documentos/Imagens/grupo-safe.jpeg" alt="Grupo Safe">
+        </div>
+
+        <div class="parceiro-card">
+          <img src="Documentos/Imagens/safe.jpeg" alt="Grupo Safe">
+        </div>
+
+        <div class="parceiro-card">
+          <img src="Documentos/Imagens/bruk.jpeg" alt="Bruke">
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FACILIDADES
+  ═══════════════════════════════════════════ -->
+  <section class="facilidades" id="facilidades">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Logística</span>
+        <h2 class="section-title">Facilidades</h2>
+        <p class="section-subtitle">Tudo o que você precisa saber para aproveitar o evento</p>
+      </div>
+
+      <div class="facilidades__bloco fade-in">
+        <div class="facilidades__bloco-header">ONDE COMER</div>
+        <div class="facilidades__bloco-body">
+          <div class="facilidades__mapa">
+            <img src="Documentos/Facilidades/onde comer.jpeg" alt="Mapa dos restaurantes próximos à EsEFEx">
+          </div>
+          <div class="facilidades__lista">
+            <p><strong class="facilidades__num facilidades__num--1">1</strong> <strong>Cantina do Jorge:</strong> serviço <em>self-service</em>, dentro da Fortaleza. Saia pelo saguão de entrada e siga à sua direita, em direção à praia de dentro.</p>
+            <p><strong class="facilidades__num facilidades__num--2">2</strong> <strong>Bar Urca:</strong> serviço <em>a la carte</em>. Você pode optar por subir ao restaurante ou pedir uma "barquinha" (executivo) e comer na mureta. Saia da Fortaleza e ande até a próxima esquina.</p>
+            <p><strong class="facilidades__num facilidades__num--3">3</strong> <strong>Garota da Urca:</strong> serviço <em>a la carte</em> e pratos executivos. Saia da Fortaleza, ande até a próxima esquina e siga à sua esquerda. Ao final da rua Candido Gaffré, vire à esquerda novamente.</p>
+            <p><strong class="facilidades__num facilidades__num--4">4</strong> <strong>Boteco Belmonte</strong> e <strong class="facilidades__num facilidades__num--5">5</strong> <strong>Canal 6:</strong> serviço <em>a la carte</em> e pratos executivos. Após passar pelo "Garota da Urca" continue, passando por baixo da passarela da TV Tupi e já verá os dois restaurantes.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CONTATO
+  ═══════════════════════════════════════════ -->
+  <section class="contato" id="contato">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Fale Conosco</span>
+        <h2 class="section-title">Entrar em Contato</h2>
+        <p class="section-subtitle">Para mais informações, entre em contato conosco através do email <a href="mailto:labio.esefex@gmail.com" class="contato__email-link">labio.esefex@gmail.com</a> ou preencha o formulário abaixo:</p>
+      </div>
+
+      <div class="contato__form-wrap fade-in">
+        <form class="contato__form" action="https://formsubmit.co/labio.esefex@gmail.com" method="POST">
+          <input type="hidden" name="_subject" value="Contato via site — XIII Fórum EsEFEx">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="">
+
+          <div class="contato__field">
+            <label for="nome" class="contato__label">Nome:</label>
+            <input type="text" id="nome" name="nome" class="contato__input" required>
+          </div>
+
+          <div class="contato__field">
+            <label for="email" class="contato__label">Email:</label>
+            <input type="email" id="email" name="email" class="contato__input" required>
+          </div>
+
+          <div class="contato__field">
+            <label for="assunto" class="contato__label">Assunto:</label>
+            <input type="text" id="assunto" name="assunto" class="contato__input" required>
+          </div>
+
+          <div class="contato__field">
+            <label for="mensagem" class="contato__label">Mensagem:</label>
+            <textarea id="mensagem" name="mensagem" class="contato__textarea" rows="6" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn--primary contato__btn">Enviar Mensagem</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <img src="../Logo esefex.png" alt="Logo EsEFEx" class="footer__logo" />
+          <p class="footer__tagline">XIII Fórum Científico da EsEFEx</p>
+          <p class="footer__desc">
+            Escola de Educação Física do Exército<br />
+            Rio de Janeiro, RJ · 11–12 Jun 2026
+          </p>
+        </div>
+        <div class="footer__nav">
+          <h4 class="footer__nav-title">Navegação</h4>
+          <ul>
+            <li><a href="#sobre">Sobre</a></li>
+            <li><a href="#palestrantes">Palestrantes</a></li>
+            <li><a href="#programacao">Programação</a></li>
+            <li><a href="submissao.html" target="_blank">Submissão</a></li>
+            <li><a href="#inscricoes">Inscrições</a></li>
+          </ul>
+        </div>
+        <div class="footer__contact">
+          <h4 class="footer__nav-title">Contato</h4>
+          <p>Para informações e parcerias:</p>
+          <a href="mailto:forum@esefex.eb.mil.br" class="footer__email">forum@esefex.eb.mil.br</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 EsEFEx — Escola de Educação Física do Exército. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════
+       MODAL — MINI-CURRÍCULO
+  ═══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="speakerModal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <div class="modal" id="modalBox">
+      <div class="modal__header">
+        <img class="modal__photo" id="modalPhoto" src="" alt="" />
+        <div class="modal__meta">
+          <h2 class="modal__name" id="modalName"></h2>
+          <p class="modal__inst" id="modalInst"></p>
+          <p class="modal__topic" id="modalTopic"></p>
+        </div>
+        <button class="modal__close" id="modalClose" aria-label="Fechar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal__body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Dados dos mini-currículos (JSON embutido) -->
+  <script id="speakersData" type="application/json">
+  [
+    {
+      "id": "samuel-wanner",
+      "name": "Prof. Dr. Samuel Wanner",
+      "inst": "UFMG",
+      "topic": "Futebol e Calor Extremo: Efeito das Condições Ambientais Sobre o Desempenho Físico",
+      "photo": "Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Dr. Samuel Wanner (UFMG)/Foto - Samuel Penna Wanner (eventos).jpg",
+      "bio": "Professor Associado do Departamento de Educação Física da Universidade Federal de Minas Gerais (UFMG). Pesquisador com ampla produção científica na área de fisiologia do exercício, com foco nos efeitos do calor e do ambiente sobre o desempenho físico e operacional.",
+      "formacao": [
+        "Professor Associado — Departamento de Educação Física, UFMG",
+        "Pesquisador em fisiologia do exercício e ambientes extremos"
+      ],
+      "contato": "samuelwanner@ufmg.br"
+    },
+    {
+      "id": "thiago-mendes",
+      "name": "Prof. Dr. Thiago Teixeira Mendes",
+      "inst": "UFBA",
+      "topic": "Efeitos do Ambiente Ice nos Aspectos de Saúde e Desempenho Físico e Operacional",
+      "photo": "Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Dr. Thiago Mendes (UFBA)/Foto perfil Thiago Mendes.jpeg",
+      "bio": "Docente do Departamento de Educação Física da Faculdade de Educação da Universidade Federal da Bahia (UFBA). Doutor em Ciências do Esporte pela UFMG, com mestrado e graduação também pela UFMG. Coordenador do projeto MEDIANTAR (Medicina e Fisiologia na Antártica), com pesquisas em fisiologia e desempenho humano em ambientes extremos.",
+      "formacao": [
+        "Doutor em Ciências do Esporte — UFMG",
+        "Mestre em Educação Física — UFMG",
+        "Graduado em Educação Física — UFMG",
+        "Coordenador do Projeto MEDIANTAR (Medicina e Fisiologia na Antártica)",
+        "Pesquisador em desempenho humano em ambientes isolados e extremos"
+      ],
+      "contato": "thiagotemendes@ufba.br"
+    },
+    {
+      "id": "andreia-naves",
+      "name": "Profa. Esp. Andreia Naves",
+      "inst": "SP",
+      "topic": "Nutrição para Esportes em Ambientes Extremos",
+      "photo": "Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Esp. Andreia Naves (SP)/WhatsApp Image 2026-03-10 at 11.28.43.jpeg",
+      "bio": "Especialista em Nutrição Esportiva Funcional, diplomada pelo The Institute for Functional Medicine (USA, 2007). Autora do Tratado de Nutrição Esportiva Funcional e de outros livros na área. Fundadora da Nutreex Clínica de Nutrição Esportiva e idealizadora do Sportia, ecossistema de nutricionistas esportivos.",
+      "formacao": [
+        "Diplomada pelo The Institute for Functional Medicine — EUA (2007)",
+        "Membro do Instituto Brasileiro de Nutrição Funcional (IBNF)",
+        "Autora do Tratado de Nutrição Esportiva Funcional",
+        "Proprietária da Nutreex Clínica de Atendimento em Nutrição Esportiva",
+        "Sócia proprietária da Muralha CrossFit",
+        "Idealizadora do Sportia — Ecossistema de Nutricionistas Esportivos"
+      ]
+    },
+    {
+      "id": "veronica-salerno",
+      "name": "Profa. Dra. Verônica Salerno",
+      "inst": "UFRJ",
+      "topic": "Impactos Bioquímicos e Hormonais de um Treinamento Militar em Clima Quente e Úmido",
+      "photo": "Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Profa. Dra. Veronica Salerno (UFRJ)/WhatsApp Image 2026-03-05 at 10.12.47.jpeg",
+      "bio": "Professora Titular da Escola de Educação Física e Desportos da UFRJ. Bióloga com mestrado e doutorado em Bioquímica Médica pela UFRJ e pós-doutorado nos EUA em Biologia Celular. Professora permanente do Programa de Pós-graduação da EEFD-UFRJ e chefe do Laboratório de Bioquímica do Exercício e Motores Moleculares.",
+      "formacao": [
+        "Professora Titular — Escola de Educação Física e Desportos, UFRJ",
+        "Pós-doutorado em Biologia Celular — EUA",
+        "Doutorado em Bioquímica Médica — UFRJ",
+        "Mestrado em Bioquímica Médica — UFRJ",
+        "Graduada em Biologia",
+        "Chefe do Laboratório de Bioquímica do Exercício e Motores Moleculares — UFRJ",
+        "Pesquisa: estresse oxidativo, lesão celular e desempenho físico"
+      ]
+    },
+    {
+      "id": "valeria-faria",
+      "name": "CC (RM3-T) Valéria Faria",
+      "inst": "CEFAN — Marinha do Brasil",
+      "topic": "Do Submarino ao Gelo: Desempenho Militar em Ambientes Extremos",
+      "photo": "Documentos/Eixo 2_ Militar e Operacional/Capitão de Corveta (RM3-T) Valéria Faria/foto.jpeg",
+      "bio": "Capitão de Corveta da Marinha do Brasil, pesquisadora do Laboratório de Ciências do Exercício e Performance (LABOCE) e líder da linha de pesquisa em desempenho humano em ambientes isolados, confinados e extremos (ICE). Vinculada ao Programa Antártico Brasileiro (PROANTAR) e docente do Curso de Pós-Graduação em Desempenho Físico do Combatente.",
+      "formacao": [
+        "Doutora em Ciências da Reabilitação — UFMG (2019)",
+        "Mestre em Educação Física — Universidade Federal de Viçosa (2013)",
+        "Especialização em Reabilitação Cardíaca e Grupos Especiais — UGF (2011)",
+        "Graduada em Educação Física — UFV (2008)",
+        "Pesquisadora do Projeto MEDIANTAR — Medicina e Fisiologia na Antártica",
+        "Docente do Curso de Pós-Graduação em Desempenho Físico do Combatente"
+      ]
+    },
+    {
+      "id": "maj-barros",
+      "name": "Maj Thiago de Barros Ramos",
+      "inst": "CBMERJ",
+      "topic": "Hipertermia Maligna em Ambiente Tático: Diagnóstico e Ação em Tempo Crítico",
+      "photo": "Documentos/Eixo 2_ Militar e Operacional/Maj Barros (CBMERJ)/IMG_8080.jpg",
+      "bio": "Major do Corpo de Bombeiros Militar do Estado do Rio de Janeiro. Doutorando em Ciências do Exercício e do Esporte pela UERJ, mestre em Educação Física pela UFRJ e bacharel em Educação Física pela EsEFEx. Assessor do Estado-Maior Geral da Corporação e instrutor do Curso de Formação de Oficiais desde 2013.",
+      "formacao": [
+        "Doutorando em Ciências do Exercício e do Esporte — UERJ",
+        "Mestre em Educação Física — UFRJ",
+        "Especialista em Comunicação Social — CEP/Exército Brasileiro",
+        "Especialista em Gestão e Governança de Segurança Pública — UnB",
+        "Bacharel em Educação Física — EsEFEx",
+        "Graduado no Curso de Formação de Oficiais — Academia de Bombeiro Militar Dom Pedro II",
+        "Instrutor do Curso de Formação de Oficiais (desde 2013)"
+      ]
+    },
+    {
+      "id": "bindialatti",
+      "name": "Edson Luques Bindialatti",
+      "inst": "Atleta Olímpico — SP",
+      "topic": "Performance no Frio: Estratégias para Atletas de Alto Rendimento em Esportes de Inverno",
+      "photo": "Documentos/Eixo 3_ Esporte de Alto Rendimento em Condições Extremas/Atleta Edson Luques Bindialatti (OLY)/Oly.jpeg",
+      "bio": "Atleta olímpico brasileiro especializado em esportes de inverno. Representante do Brasil em competições internacionais de alto nível, com vasta experiência em performance em ambientes de frio extremo.",
+      "formacao": []
+    },
+    {
+      "id": "leandro-gregorut",
+      "name": "Dr. Leandro Gregorut Lima",
+      "inst": "IRONMAN Brasil — SP",
+      "topic": "Emergências Fisiológicas e Gestão de Risco nas Provas do IRONMAN Brasil",
+      "photo": "Documentos/Eixo 3_ Esporte de Alto Rendimento em Condições Extremas/Dr. Leandro Gregorut (IRONMAN)/WhatsApp Image 2026-03-09 at 22.54.19.jpeg",
+      "bio": "Médico graduado pela Faculdade de Medicina da USP (FMUSP). Especialista em Cirurgia do Ombro e Cotovelo e em Medicina Esportiva. Doutor pela FMUSP e Pós-Doutorando pelo INCOR-HC FMUSP. Diretor Médico das provas do IRONMAN Brasil desde 2019 e ex-médico da Seleção Brasileira Feminina de Handebol (2009–2014).",
+      "formacao": [
+        "Graduado em Medicina — FMUSP",
+        "Residência em Ortopedia e Traumatologia — IOT/HC-FMUSP",
+        "Especialista em Cirurgia do Ombro e Cotovelo — IOT/HC-FMUSP",
+        "Especialista em Medicina Esportiva — SBMEE",
+        "Especialista em Medicina Regenerativa",
+        "Doutor — Faculdade de Medicina da USP",
+        "Pós-Doutorando — INCOR-HC FMUSP",
+        "Diretor Médico IRONMAN Brasil (desde 2019)",
+        "Ex-médico da Seleção Brasileira Feminina de Handebol (2009–2014)"
+      ]
+    },
+    {
+      "id": "danielli-mello",
+      "name": "Profa. Dra. Danielli Mello",
+      "inst": "—",
+      "topic": "Esporte de Alto Rendimento em Condições Extremas",
+      "photo": "Documentos/Eixo 3_ Esporte de Alto Rendimento em Condições Extremas/Profa. Dra. Danielli Mello/Dani Mello 2.jpg",
+      "bio": "Professora Doutora com atuação em Esporte de Alto Rendimento em Condições Extremas.",
+      "formacao": []
+    },
+    {
+      "id": "alex-souto",
+      "name": "Prof. Dr. Alex Souto Maior",
+      "inst": "RJ",
+      "topic": "Treino de Força e Criança: Um Olhar Biomecânico e Fisiológico",
+      "photo": "Documentos/Eixo 4_ Treinamento de força para alta performance/Prof. Dr. Alex Souto Maior/WhatsApp Image 2026-03-01 at 16.13.28.jpeg",
+      "bio": "Fisiologista do esporte, pesquisador e professor. Pós-doutor em Fisiologia pela UFRJ, doutor em Fisiologia pela UFRJ e mestre em Engenharia Biomédica. Autor dos livros Fisiologia dos Exercícios Resistidos e Manual para Performance e Prevenção de Lesões, referências na área. Atuou como treinador e consultor em clubes de futebol.",
+      "formacao": [
+        "Pós-Doutor em Fisiologia — UFRJ",
+        "Doutor em Fisiologia — UFRJ",
+        "Mestre em Engenharia Biomédica — UNIVAP",
+        "Especialista em Treinamento de Força",
+        "Autor de 'Fisiologia dos Exercícios Resistidos'",
+        "Autor de 'Manual para Performance e Prevenção de Lesões'"
+      ]
+    },
+    {
+      "id": "belmiro-salles",
+      "name": "Prof. Dr. Belmiro de Salles",
+      "inst": "UFRJ — RJ",
+      "topic": "Métodos de Treinamento de Força",
+      "photo": "Documentos/Eixo 4_ Treinamento de força para alta performance/Prof. Dr. Belmiro de Salles_/belmiro.webp",
+      "bio": "Professor Pesquisador da Universidade Federal do Rio de Janeiro (UFRJ) e coordenador do STLAB (Laboratório de Treinamento de Força). Membro internacional da National Strength and Conditioning Association (NSCA). Autor de 101 estudos científicos e 2 livros best-sellers na área de treinamento de força. Palestrante em mais de 250 eventos nacionais e internacionais em 22 estados brasileiros.",
+      "formacao": [
+        "Graduado em Educação Física — EEFD/UFRJ",
+        "Especialização em Treinamento de Força — UGF",
+        "Mestre em Educação Física — UFRJ",
+        "Doutor em Fisiopatologia Clínica — FISCLINEX/UERJ",
+        "Pós-Doutorado — UFRJ",
+        "Coordenador do STLAB — Laboratório de Treinamento de Força/UFRJ",
+        "Membro Internacional da NSCA"
+      ]
+    },
+    {
+      "id": "grazzi-favarato",
+      "name": "Profa. Esp. Grazzi Favarato",
+      "inst": "Assoc. Desportiva Centro Olímpico — SP",
+      "topic": "LPO: Benefícios na Utilização Dentro da Preparação Física",
+      "photo": "Documentos/Eixo 4_ Treinamento de força para alta performance/Profa. Esp. Grazzi Favarato/WhatsApp Image 2026-03-10 at 16.00.50.jpeg",
+      "bio": "Docente do Instituto Olímpico Brasileiro e palestrante da IHRSA-Fitness Brasil. Gerente Esportiva e coordenadora de LPO (Levantamento de Peso Olímpico) da Associação Desportiva do Centro Olímpico de São Paulo.",
+      "formacao": [
+        "Docente — Instituto Olímpico Brasileiro",
+        "Palestrante — IHRSA / Fitness Brasil",
+        "Gerente Esportiva — Associação Desportiva do Centro Olímpico (SP)",
+        "Coordenadora de LPO — Associação Desportiva do Centro Olímpico"
+      ]
+    },
+    {
+      "id": "fernando-torres",
+      "name": "Dr. Fernando Torres",
+      "inst": "Presidente SBMEE — SPFC — SP",
+      "topic": "Medicina do Esporte no Futebol",
+      "photo": "Documentos/Eixo 5_ Futebol_ Desempenho em Ano de Copa/Dr. Fernando Torres/WhatsApp Image 2026-03-09 at 15.51.15.jpeg",
+      "bio": "Médico especialista em Medicina Esportiva, titulado pela Sociedade Brasileira de Medicina do Exercício e do Esporte (SBMEE/AMB). Presidente da SBMEE (2023–2025). Doutor e Mestre em Desempenho Físico e Esportivo pela UFPR. Docente da CBF Academy, do IOB/COB e do CBC. Membro da Divisão de Excelência Médica do São Paulo Futebol Clube.",
+      "formacao": [
+        "Doutor em Desempenho Físico e Esportivo — UFPR",
+        "Mestre em Desempenho Físico e Esportivo — UFPR",
+        "Especialista em Medicina Esportiva — UNIFESP",
+        "Presidente da SBMEE (2023–2025)",
+        "Docente da CBF Academy",
+        "Docente da Academia Brasileira de Treinadores (ABT) — IOB/COB",
+        "Membro da Divisão de Excelência Médica do São Paulo FC"
+      ]
+    },
+    {
+      "id": "daniel-goncalves",
+      "name": "Prof. Ms. Daniel Gonçalves",
+      "inst": "Palmeiras — SP",
+      "topic": "Planejamento Científico do Alto Rendimento no Futebol Profissional",
+      "photo": null,
+      "bio": "Profissional de Educação Física atuando no futebol profissional de alto nível. Membro da comissão técnica do Palmeiras, com expertise em planejamento científico do rendimento físico no futebol de elite.",
+      "formacao": []
+    }
+  ]
+  </script>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

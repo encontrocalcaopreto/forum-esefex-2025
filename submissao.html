@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submissão de Trabalhos — XIII Fórum EsEFEx 2026</title>
+  <meta name="description" content="Portal de submissão de resumos para o XIII Fórum Científico da EsEFEx 2026." />
+  <link rel="icon" type="image/png" href="../Logo esefex.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS (espelho do site principal) ── */
+    :root {
+      --bg:          #0e0c0a;
+      --bg-2:        #131008;
+      --bg-card:     #1a1510;
+      --bg-card-h:   #211a12;
+      --border:      rgba(220,120,20,.14);
+      --border-h:    rgba(220,120,20,.40);
+      --fire:        #ff6b1a;
+      --fire-dim:    rgba(255,107,26,.15);
+      --fire-glow:   rgba(255,107,26,.40);
+      --amber:       #f59e0b;
+      --amber-dim:   rgba(245,158,11,.15);
+      --cyan:        #00b4d8;
+      --grad:        linear-gradient(135deg,#ff6b1a 0%,#f59e0b 100%);
+      --grad-subtle: linear-gradient(135deg,rgba(255,107,26,.08) 0%,rgba(245,158,11,.08) 100%);
+      --text:        #f0ebe4;
+      --text-dim:    #9a8a78;
+      --text-muted:  #5a4e42;
+      --font-head:   'Rajdhani', sans-serif;
+      --font-body:   'Inter', sans-serif;
+      --radius:      10px;
+      --radius-lg:   16px;
+      --shadow:      0 8px 32px rgba(0,0,0,.6);
+      --shadow-fire: 0 0 28px rgba(255,107,26,.22);
+      --trans:       .25s ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+
+    .container { width: min(1000px, 100% - 3rem); margin-inline: auto; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #080604;
+      border-bottom: 1px solid var(--border);
+      padding: .9rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .topbar__brand {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .topbar__logo {
+      height: 36px;
+      width: auto;
+    }
+    .topbar__title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .topbar__title span {
+      display: block;
+      font-size: .7rem;
+      font-weight: 400;
+      color: var(--text-dim);
+      letter-spacing: .08em;
+    }
+    .topbar__back {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .85rem;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .4rem .9rem;
+      transition: color var(--trans), border-color var(--trans);
+      white-space: nowrap;
+    }
+    .topbar__back:hover { color: var(--fire); border-color: var(--border-h); }
+
+    /* ── HERO ── */
+    .sub-hero {
+      padding: 4rem 0 3rem;
+      text-align: center;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .sub-hero__badge {
+      display: inline-block;
+      font-family: var(--font-head);
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--fire);
+      background: var(--fire-dim);
+      border: 1px solid rgba(255,107,26,.25);
+      border-radius: 99px;
+      padding: .3rem 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .sub-hero__title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: .04em;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: .75rem;
+    }
+    .sub-hero__sub {
+      color: var(--text-dim);
+      font-size: 1rem;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── ACTION BAR ── */
+    .action-bar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-h);
+      padding: 1.25rem 0;
+    }
+    .action-bar__inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: var(--font-head);
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      padding: .65rem 1.4rem;
+      border: 1px solid transparent;
+      transition: all var(--trans);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn--primary {
+      background: var(--grad);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255,107,26,.35);
+    }
+    .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,26,.5); }
+    .btn--outline {
+      background: transparent;
+      color: var(--text-dim);
+      border-color: var(--border-h);
+    }
+    .btn--outline:hover { color: var(--text); border-color: var(--fire); }
+    .btn--ghost {
+      background: var(--fire-dim);
+      color: var(--fire);
+      border-color: rgba(255,107,26,.25);
+    }
+    .btn--ghost:hover { background: rgba(255,107,26,.25); }
+    .btn--disabled {
+      opacity: .4;
+      pointer-events: none;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .sub-main { padding: 3rem 0 5rem; }
+    .sub-section { margin-bottom: 3rem; }
+    .sub-section__label {
+      font-family: var(--font-head);
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--fire);
+      margin-bottom: .6rem;
+    }
+    .sub-section__title {
+      font-family: var(--font-head);
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── INTRO TEXT ── */
+    .intro-text {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--fire);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      color: var(--text-dim);
+      font-size: .95rem;
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── LINHAS GRID ── */
+    .linhas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .linha-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      transition: border-color var(--trans), box-shadow var(--trans);
+    }
+    .linha-card:hover { border-color: var(--border-h); box-shadow: var(--shadow-fire); }
+    .linha-card__num {
+      font-family: var(--font-head);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--fire);
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+    .linha-card__title {
+      font-family: var(--font-head);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: .75rem;
+    }
+    .linha-card__desc { font-size: .9rem; color: var(--text-dim); line-height: 1.65; }
+
+    /* ── DATAS ── */
+    .datas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .data-card {
+      background: var(--grad-subtle);
+      border: 1px solid var(--border-h);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .data-card__icon {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      background: var(--fire-dim);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fire);
+    }
+    .data-card__label {
+      font-family: var(--font-head);
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: .3rem;
+    }
+    .data-card__date {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--fire);
+    }
+    .data-card__desc { font-size: .85rem; color: var(--text-dim); margin-top: .2rem; }
+
+    /* ── ORIENTAÇÕES ── */
+    .orientacoes-list {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+    .orientacao-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      font-size: .9rem;
+      line-height: 1.65;
+      color: var(--text-dim);
+      transition: border-color var(--trans);
+    }
+    .orientacao-item:hover { border-color: var(--border-h); }
+    .orientacao-item__key {
+      font-family: var(--font-head);
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      min-width: 170px;
+    }
+    .orientacao-item a { color: var(--cyan); text-decoration: underline; }
+
+    /* ── APRESENTAÇÃO ── */
+    .modalidade-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .modalidade-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      transition: border-color var(--trans);
+    }
+    .modalidade-card:hover { border-color: var(--border-h); }
+    .modalidade-card__icon {
+      width: 40px; height: 40px;
+      background: var(--amber-dim);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+    .modalidade-card__title {
+      font-family: var(--font-head);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: .05em;
+      margin-bottom: .75rem;
+    }
+    .modalidade-card__body { font-size: .88rem; color: var(--text-dim); line-height: 1.7; }
+    .modalidade-card__body ul { list-style: disc; padding-left: 1.2rem; margin-top: .5rem; }
+    .modalidade-card__body li { margin-bottom: .3rem; }
+
+    /* ── CRITÉRIOS ── */
+    .criterios-list {
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      counter-reset: crit;
+    }
+    .criterio-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .9rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: .92rem;
+      color: var(--text-dim);
+      transition: border-color var(--trans);
+    }
+    .criterio-item:hover { border-color: var(--border-h); color: var(--text); }
+    .criterio-item__num {
+      font-family: var(--font-head);
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--fire);
+      background: var(--fire-dim);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── COMISSÃO (ACCORDION) ── */
+    .accordion {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .accordion__trigger {
+      width: 100%;
+      background: var(--bg-card);
+      border: none;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: .04em;
+      transition: background var(--trans);
+    }
+    .accordion__trigger:hover { background: var(--bg-card-h); }
+    .accordion__trigger svg {
+      transition: transform var(--trans);
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+    .accordion__trigger.open svg { transform: rotate(180deg); }
+    .accordion__body {
+      display: none;
+      padding: 1.5rem;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+    }
+    .accordion__body.open { display: block; }
+    .comissao-coord {
+      font-family: var(--font-head);
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--fire);
+      margin-bottom: .5rem;
+    }
+    .comissao-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: .5rem;
+      margin-top: .75rem;
+    }
+    .comissao-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .6rem 1rem;
+      font-size: .85rem;
+    }
+    .comissao-item__name { color: var(--text); font-weight: 500; }
+    .comissao-item__inst { color: var(--text-muted); font-size: .78rem; }
+
+    /* ── FOOTER ── */
+    .sub-footer {
+      background: #080604;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 0;
+      text-align: center;
+      font-size: .82rem;
+      color: var(--text-muted);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .linhas-grid, .datas-grid, .modalidade-grid { grid-template-columns: 1fr; }
+      .topbar__back span { display: none; }
+      .action-bar__inner { flex-direction: column; align-items: stretch; }
+      .btn { justify-content: center; }
+      .orientacao-item { flex-direction: column; gap: .3rem; }
+      .orientacao-item__key { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <div class="topbar__brand">
+        <img src="../Logo esefex.png" alt="Logo EsEFEx" class="topbar__logo">
+        <div class="topbar__title">
+          XIII Fórum Científico
+          <span>Escola de Educação Física do Exército · 2026</span>
+        </div>
+      </div>
+      <a href="index.html" class="topbar__back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Voltar ao site</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="sub-hero">
+    <div class="container">
+      <div class="sub-hero__badge">Submissão de Trabalhos · 2026</div>
+      <h1 class="sub-hero__title">Portal de Submissão</h1>
+      <p class="sub-hero__sub">Submeta seu resumo, baixe o template e acompanhe os trabalhos aprovados para o XIII Fórum Científico da EsEFEx.</p>
+    </div>
+  </section>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <div class="container action-bar__inner">
+      <a href="Documentos/template-forum.docx" download class="btn btn--primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download do Template
+      </a>
+      <a href="https://docs.google.com/forms" target="_blank" rel="noopener" class="btn btn--ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Submeter Resumo
+      </a>
+      <a href="Documentos/Submissao/Aprovacao.pdf" target="_blank" rel="noopener" class="btn btn--outline btn--disabled">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Trabalhos Aprovados
+      </a>
+      <a href="Documentos/Submissao/posteres-quinta.pdf" target="_blank" rel="noopener" class="btn btn--outline btn--disabled">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+        Pôsteres — Quinta
+      </a>
+      <a href="Documentos/Submissao/posteres-sexta.pdf" target="_blank" rel="noopener" class="btn btn--outline btn--disabled">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+        Pôsteres — Sexta
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="sub-main">
+    <div class="container">
+
+      <!-- 1. CHAMADA -->
+      <section class="sub-section">
+        <div class="sub-section__label">Chamada de Trabalhos</div>
+        <h2 class="sub-section__title">Sobre a Submissão</h2>
+        <p class="intro-text">
+          Convidamos pesquisadores e profissionais a contribuírem com seus trabalhos para o XIII Fórum Científico da EsEFEx. Os resumos devem ser enviados em uma das duas linhas de concentração abaixo. Não serão aceitos trabalhos incompletos ou projetos de pesquisa. O autor que apresentará o trabalho deverá estar inscrito no evento, mas a submissão pode ser feita antes da inscrição.
+        </p>
+
+        <div class="linhas-grid">
+          <div class="linha-card">
+            <div class="linha-card__num">Linha 01</div>
+            <div class="linha-card__title">Esporte, Exercício e Saúde</div>
+            <p class="linha-card__desc">Trabalhos que avaliam os efeitos do esporte e do exercício na saúde física e mental, desde estratégias de treinamento até abordagens inovadoras de reabilitação.</p>
+          </div>
+          <div class="linha-card">
+            <div class="linha-card__num">Linha 02</div>
+            <div class="linha-card__title">Saúde e Capacitação Física do Combatente</div>
+            <p class="linha-card__desc">Desafios dos profissionais de segurança e militares em relação à saúde e desempenho físico, do treinamento de combate à gestão de lesões e otimização em ambientes operacionais.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. DATAS IMPORTANTES -->
+      <section class="sub-section">
+        <div class="sub-section__label">Calendário</div>
+        <h2 class="sub-section__title">Datas Importantes</h2>
+        <div class="datas-grid">
+          <div class="data-card">
+            <div class="data-card__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <div class="data-card__label">Prazo de Submissão</div>
+              <div class="data-card__date">A definir</div>
+              <div class="data-card__desc">Até 23h59 — impreterivelmente</div>
+            </div>
+          </div>
+          <div class="data-card">
+            <div class="data-card__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <div class="data-card__label">Resultado da Seleção</div>
+              <div class="data-card__date">A definir</div>
+              <div class="data-card__desc">Notificação por email ao autor correspondente</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. ORIENTAÇÕES -->
+      <section class="sub-section">
+        <div class="sub-section__label">Instruções</div>
+        <h2 class="sub-section__title">Orientações para o Resumo</h2>
+        <div class="orientacoes-list">
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Limite de palavras</div>
+            <div>Máximo de <strong>250 palavras</strong>. Não serão aceitos resumos acima deste limite.</div>
+          </div>
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Formato do arquivo</div>
+            <div>Arquivo <strong>.doc ou .docx</strong>, obedecendo ao template disponível para download acima. Não serão aceitos outros formatos.</div>
+          </div>
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Título</div>
+            <div>Conciso. Usar letra maiúscula apenas na primeira letra ou quando gramaticalmente necessário.</div>
+          </div>
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Autores e instituições</div>
+            <div>Usar nome completo com numeração correspondente para instituição (conforme template). Não há limite de autores.</div>
+          </div>
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Estrutura obrigatória</div>
+            <div>O resumo deve conter obrigatoriamente: <strong>Introdução · Objetivo · Métodos · Resultados · Conclusão</strong>. Seções opcionais: Referências Bibliográficas e Agradecimentos.</div>
+          </div>
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Palavras-chave</div>
+            <div>Até <strong>5 palavras-chave</strong>, conforme o DeCS (<a href="https://decs.bvsalud.org/" target="_blank" rel="noopener">decs.bvsalud.org</a>), separadas por vírgula.</div>
+          </div>
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Referências</div>
+            <div>Não obrigatório. Se houver citações, incluir até <strong>3 obras no estilo Vancouver</strong>. Caso não haja, apagar a seção "Referências" do template.</div>
+          </div>
+          <div class="orientacao-item">
+            <div class="orientacao-item__key">Autor correspondente</div>
+            <div>Indicar nome completo e email de contato do autor correspondente no formulário de submissão.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. APRESENTAÇÃO -->
+      <section class="sub-section">
+        <div class="sub-section__label">Modalidades</div>
+        <h2 class="sub-section__title">Apresentação de Trabalhos</h2>
+        <p style="color:var(--text-dim);font-size:.9rem;margin-bottom:1.25rem;">Somente serão apresentados os resumos aprovados pela comissão científica. Trabalhos não apresentados durante o evento não serão publicados nos anais.</p>
+        <div class="modalidade-grid">
+          <div class="modalidade-card">
+            <div class="modalidade-card__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="modalidade-card__title">Apresentação Oral</div>
+            <div class="modalidade-card__body">
+              Os dois melhores trabalhos de cada linha de concentração serão selecionados para apresentação oral. A elaboração dos slides é de responsabilidade do(s) autor(es).
+              <ul>
+                <li>Sem modelo de apresentação obrigatório</li>
+                <li>Deve conter as mesmas seções do resumo</li>
+                <li>Logo do evento obrigatório em todos os slides</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modalidade-card">
+            <div class="modalidade-card__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="modalidade-card__title">Pôster</div>
+            <div class="modalidade-card__body">
+              A confecção do banner é de responsabilidade do(s) autor(es). Ao menos um autor inscrito deve permanecer no local durante o horário de apresentação.
+              <ul>
+                <li>Dimensões: <strong>120 cm (altura) × 90 cm (largura)</strong></li>
+                <li>Leitura legível a ≈ 1,5 m de distância</li>
+                <li>Parte superior: título, autores, instituição e logo do evento</li>
+                <li>Preferir esquemas, figuras e tabelas ao invés de texto</li>
+                <li>Estrutura: Introdução · Objetivo · Métodos · Resultados · Conclusão</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. CRITÉRIOS -->
+      <section class="sub-section">
+        <div class="sub-section__label">Avaliação</div>
+        <h2 class="sub-section__title">Critérios de Avaliação</h2>
+        <div class="criterios-list">
+          <div class="criterio-item"><div class="criterio-item__num">01</div>Relevância à temática do evento</div>
+          <div class="criterio-item"><div class="criterio-item__num">02</div>Escrita acadêmico-científica, atendendo ao máximo de 250 palavras</div>
+          <div class="criterio-item"><div class="criterio-item__num">03</div><strong style="color:var(--text);margin-right:.3rem">Introdução:</strong> clareza, concisão, apresentação e justificativa/relevância</div>
+          <div class="criterio-item"><div class="criterio-item__num">04</div><strong style="color:var(--text);margin-right:.3rem">Objetivo:</strong> clareza e concisão</div>
+          <div class="criterio-item"><div class="criterio-item__num">05</div><strong style="color:var(--text);margin-right:.3rem">Métodos:</strong> amostra descrita, avaliações apresentadas e adequação dos procedimentos de análise</div>
+          <div class="criterio-item"><div class="criterio-item__num">06</div><strong style="color:var(--text);margin-right:.3rem">Resultados:</strong> em acordo com os objetivos, clareza na apresentação</div>
+          <div class="criterio-item"><div class="criterio-item__num">07</div><strong style="color:var(--text);margin-right:.3rem">Conclusão:</strong> síntese dos achados e conexão com o objetivo</div>
+        </div>
+      </section>
+
+      <!-- 6. COMISSÃO CIENTÍFICA (accordion) -->
+      <section class="sub-section">
+        <div class="sub-section__label">Comitê</div>
+        <h2 class="sub-section__title">Comissão Científica</h2>
+        <div class="accordion">
+          <button class="accordion__trigger" id="acc-trigger" aria-expanded="false">
+            Ver composição da Comissão Científica
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="accordion__body" id="acc-body">
+            <div class="comissao-coord">Coordenação</div>
+            <div class="comissao-grid" style="margin-bottom:1.5rem">
+              <div class="comissao-item">
+                <div class="comissao-item__name">Profa. Dra. Míriam Raquel Meira Mainenti</div>
+                <div class="comissao-item__inst">EsEFEx</div>
+              </div>
+            </div>
+            <div class="comissao-coord">Membros</div>
+            <div class="comissao-grid">
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Adriane Mara de Souza Muniz</div><div class="comissao-item__inst">EsEFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Angela Nogueira Neves</div><div class="comissao-item__inst">EsEFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Bruno Jotta da Costa</div><div class="comissao-item__inst">Universidade Estácio de Sá</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. CC RM3-T Bruno Ferreira Viana</div><div class="comissao-item__inst">CEFAN/MB e PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Carlos Eduardo Lima Monteiro</div><div class="comissao-item__inst">Sesc-RJ e Special Sports Kids</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Claudia de Mello Meirelles</div><div class="comissao-item__inst">EsEFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Danielli Braga de Mello</div><div class="comissao-item__inst">EsEFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Diego Viana Gomes</div><div class="comissao-item__inst">EEFD/UFRJ</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Me. Cap Fabio Alves Machado Gomes</div><div class="comissao-item__inst">IPCFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Fabrícia Geralda Ferreira</div><div class="comissao-item__inst">PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Felipe Arruda Moura</div><div class="comissao-item__inst">UEL</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Cap PM Fernando Alves Santa Rosa</div><div class="comissao-item__inst">EEF/PMESP</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Grace Barros de Sá</div><div class="comissao-item__inst">UERJ</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Guilherme Rosa de Abreu</div><div class="comissao-item__inst">UFRRJ</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Helder Guerra de Resende</div><div class="comissao-item__inst">PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Irleidos Santos</div><div class="comissao-item__inst">PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. José Roberto Andrade do Nascimento Junior</div><div class="comissao-item__inst">PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Ten Marcio Antonio de Barros Sena</div><div class="comissao-item__inst">IPCFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Milena Soriano Marcolino</div><div class="comissao-item__inst">UFMG</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Patrícia dos Santos Vigário</div><div class="comissao-item__inst">UNISUAM</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Paulo Roberto Garcia Lucareli</div><div class="comissao-item__inst">UNINOVE</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. CC (S) Priscila dos Santos Bunn</div><div class="comissao-item__inst">CEFAN e PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Me. Cap Rodrigo de Freitas Costa</div><div class="comissao-item__inst">IPCFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Rodrigo Gomes de Souza Vale</div><div class="comissao-item__inst">UERJ</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Roger Gomes Tavares de Mello</div><div class="comissao-item__inst">Escola Naval</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Sabrina Graziani Veloso Dutra-Malvar</div><div class="comissao-item__inst">EEFD/UFRJ</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Cel Samir Ezequiel da Rosa</div><div class="comissao-item__inst">CCFEx</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Thalita Ponce Sobral</div><div class="comissao-item__inst">UFRJ / UNISUAM / CREF1</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Thiago Torres da Matta</div><div class="comissao-item__inst">EEFD/UFRJ</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Profa. Dra. Verônica Salerno Pinto</div><div class="comissao-item__inst">EEFD/UFRJ</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Vinícius de Oliveira Damasceno</div><div class="comissao-item__inst">PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Wagner Jorge Ribeiro Domingues</div><div class="comissao-item__inst">PPGDHO/UNIFA</div></div>
+              <div class="comissao-item"><div class="comissao-item__name">Prof. Dr. Maj FAB Willian Carrero Botta</div><div class="comissao-item__inst">PPGDHO/UNIFA</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="sub-footer">
+    <div class="container">
+      &copy; 2026 EsEFEx — Escola de Educação Física do Exército. Todos os direitos reservados.
+    </div>
+  </footer>
+
+  <script>
+    const trigger = document.getElementById('acc-trigger');
+    const body = document.getElementById('acc-body');
+    trigger.addEventListener('click', () => {
+      const open = body.classList.toggle('open');
+      trigger.classList.toggle('open', open);
+      trigger.setAttribute('aria-expanded', open);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(ls \"c:/Users/alexs/OneDrive/Desktop/Projetos/esefexforum-main/forum-esefex-2025/Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Dr. Samuel Wanner \\(UFMG\\)/\")",
+      "Bash(ls \"c:/Users/alexs/OneDrive/Desktop/Projetos/esefexforum-main/forum-esefex-2025/Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Dr. Thiago Mendes \\(UFBA\\)/\")",
+      "Bash(ls \"c:/Users/alexs/OneDrive/Desktop/Projetos/esefexforum-main/forum-esefex-2025/Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Prof. Esp. Andreia Naves \\(SP\\)/\")",
+      "Bash(ls \"c:/Users/alexs/OneDrive/Desktop/Projetos/esefexforum-main/forum-esefex-2025/Documentos/Eixo 1_ Fisiologia do Desempenho em Ambientes Extremos/Profa. Dra. Veronica Salerno \\(UFRJ\\)/\")",
+      "Bash(ls \"c:/Users/alexs/OneDrive/Desktop/Projetos/esefexforum-main/forum-esefex-2025/Documentos/Eixo 2_ Militar e Operacional/Capitão de Corveta \\(RM3-T\\) Valéria Faria/\")",
+      "Bash(ls \"c:/Users/alexs/OneDrive/Desktop/Projetos/esefexforum-main/forum-esefex-2025/Documentos/Eixo 2_ Militar e Operacional/Maj Barros \\(CBMERJ\\)/\")",
+      "Bash(ls \"c:/Users/alexs/OneDrive/Desktop/Projetos/esefexforum-main/forum-esefex-2025/Documentos/Eixo 3_ Esporte de Alto Rendimento em Condições Extremas/Dr. Leandro Gregorut \\(IRONMAN\\)/\")",
+      "Bash(python gerar_imagens.py)",
+      "Bash(find c:UsersalexsOneDriveDesktopProjetosesefexforum-mainforum-esefex-2025 -type f -iname *.jpg -o -iname *.jpeg -o -iname *.png -o -iname *.gif -o -iname *.webp)",
+      "Bash(python3 -c \"import fitz; print\\(''pymupdf ok''\\)\")",
+      "Bash(python -c \"import fitz; print\\(''pymupdf ok''\\)\")",
+      "Bash(python3 -c \"from pdf2image import convert_from_path; print\\(''pdf2image ok''\\)\")",
+      "Bash(python -c \"from pdf2image import convert_from_path; print\\(''pdf2image ok''\\)\")"
+    ]
+  }
+}
