@@ -56,6 +56,29 @@ function doPost(e) {
         payment_id: paymentResult.id,
         message: 'Pagamento aprovado com sucesso!'
       })).setMimeType(ContentService.MimeType.JSON);
+
+    } else if (paymentResult.status === 'pending' && paymentResult.payment_method_id === 'pix') {
+      // Pix: status pending — retornar QR Code para o frontend exibir
+      // Salvar na planilha como "Aguardando Pix"
+      try {
+        saveToSheet(inscrito, items, total, paymentResult, 'Aguardando Pix');
+        Logger.log('Planilha salva (Pix pendente)');
+      } catch (sheetErr) {
+        Logger.log('ERRO ao salvar na planilha (Pix): ' + sheetErr.toString());
+      }
+
+      const pixData = paymentResult.point_of_interaction || {};
+      const txData = pixData.transaction_data || {};
+
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'pending_pix',
+        payment_id: paymentResult.id,
+        qr_code: txData.qr_code || '',
+        qr_code_base64: txData.qr_code_base64 || '',
+        ticket_url: txData.ticket_url || '',
+        message: 'Pix gerado! Escaneie o QR Code para pagar.'
+      })).setMimeType(ContentService.MimeType.JSON);
+
     } else {
       return ContentService.createTextOutput(JSON.stringify({
         status: paymentResult.status || 'rejected',
@@ -152,13 +175,14 @@ function processPayment(paymentData, inscrito, items, total) {
     payment_type_id: result.payment_type_id,
     fee_details: result.fee_details,
     transaction_details: result.transaction_details,
+    point_of_interaction: result.point_of_interaction,
   };
 }
 
 /**
  * Salvar inscrição na Google Sheets
  */
-function saveToSheet(inscrito, items, total, paymentResult) {
+function saveToSheet(inscrito, items, total, paymentResult, statusOverride) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   let sheet = ss.getSheetByName(SHEET_NAME);
 
@@ -239,7 +263,7 @@ function saveToSheet(inscrito, items, total, paymentResult) {
     Math.round(taxaPct * 100) / 100,
     Math.round(taxaReais * 100) / 100,
     Math.round(valorLiquido * 100) / 100,
-    'Aprovado',
+    statusOverride || 'Aprovado',
     paymentResult.id
   ]);
 }

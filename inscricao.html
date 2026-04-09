@@ -298,6 +298,60 @@
       color: var(--text-muted); font-size: .8rem;
     }
 
+    /* ── PIX QR CODE MODAL ── */
+    .pix-modal {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(14,12,10,.95); z-index: 1000;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .pix-modal.visible { display: flex; }
+    .pix-modal__card {
+      background: var(--bg-card); border: 1px solid var(--border-h);
+      border-radius: var(--radius-lg); padding: 2.5rem 2rem;
+      text-align: center; max-width: 420px; width: 100%;
+    }
+    .pix-modal__icon {
+      width: 56px; height: 56px; margin: 0 auto 1rem;
+      background: rgba(0,180,216,.12); border: 2px solid var(--cyan);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .pix-modal__icon svg { width: 28px; height: 28px; stroke: var(--cyan); }
+    .pix-modal__title {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+      margin-bottom: .5rem;
+    }
+    .pix-modal__sub { color: var(--text-dim); font-size: .9rem; margin-bottom: 1.5rem; }
+    .pix-modal__qr {
+      background: #fff; border-radius: var(--radius); padding: 1rem;
+      display: inline-block; margin-bottom: 1.5rem;
+    }
+    .pix-modal__qr img { width: 220px; height: 220px; }
+    .pix-modal__copy-label {
+      font-family: var(--font-head); font-size: .75rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: .5rem;
+    }
+    .pix-modal__code-wrap {
+      display: flex; gap: .5rem; margin-bottom: 1.5rem;
+    }
+    .pix-modal__code {
+      flex: 1; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .6rem .8rem;
+      color: var(--text); font-size: .75rem; font-family: monospace;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      text-align: left;
+    }
+    .pix-modal__copy-btn {
+      background: var(--grad); border: none; color: #fff; font-family: var(--font-head);
+      font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      padding: .6rem 1.2rem; border-radius: var(--radius); cursor: pointer;
+      transition: all var(--trans); white-space: nowrap;
+    }
+    .pix-modal__copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,107,26,.35); }
+    .pix-modal__timer { color: var(--text-dim); font-size: .8rem; }
+    .pix-modal__timer strong { color: var(--fire); }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .tickets__grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
@@ -496,6 +550,32 @@
   <div class="notice">
     <div class="container">
       <p>Inscrições abertas até <strong>12/06/2026</strong> — Vagas limitadas</p>
+    </div>
+  </div>
+
+  <!-- ── PIX QR CODE MODAL ── -->
+  <div class="pix-modal" id="pixModal">
+    <div class="pix-modal__card">
+      <div class="pix-modal__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <rect x="7" y="7" width="3" height="3" />
+          <rect x="14" y="7" width="3" height="3" />
+          <rect x="7" y="14" width="3" height="3" />
+          <rect x="14" y="14" width="3" height="3" />
+        </svg>
+      </div>
+      <h2 class="pix-modal__title">Pague com Pix</h2>
+      <p class="pix-modal__sub">Escaneie o QR Code com o app do seu banco ou copie o código abaixo.</p>
+      <div class="pix-modal__qr">
+        <img id="pixQrImage" alt="QR Code Pix" />
+      </div>
+      <p class="pix-modal__copy-label">Pix Copia e Cola</p>
+      <div class="pix-modal__code-wrap">
+        <div class="pix-modal__code" id="pixCode"></div>
+        <button class="pix-modal__copy-btn" id="pixCopyBtn">Copiar</button>
+      </div>
+      <p class="pix-modal__timer">O QR Code expira em <strong>30 minutos</strong></p>
     </div>
   </div>
 
@@ -784,6 +864,12 @@
             paymentId: result.payment_id,
           }));
           window.location.href = 'inscricao-confirmada.html';
+
+        } else if (result.status === 'pending_pix') {
+          // Pix: mostrar QR Code na tela
+          overlay.classList.remove('visible');
+          showPixModal(result);
+
         } else {
           overlay.classList.remove('visible');
           const msg = result.message || 'Pagamento não aprovado. Tente outra forma de pagamento.';
@@ -795,6 +881,43 @@
         console.error('Backend error:', err);
         showError(paymentError, 'Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
       }
+    }
+
+    /* ================================================================
+       PIX QR CODE
+    ================================================================ */
+    function showPixModal(result) {
+      const modal    = document.getElementById('pixModal');
+      const qrImage  = document.getElementById('pixQrImage');
+      const pixCode  = document.getElementById('pixCode');
+      const copyBtn  = document.getElementById('pixCopyBtn');
+
+      // Exibir QR Code (imagem base64)
+      if (result.qr_code_base64) {
+        qrImage.src = 'data:image/png;base64,' + result.qr_code_base64;
+      }
+
+      // Exibir código Pix Copia e Cola
+      if (result.qr_code) {
+        pixCode.textContent = result.qr_code;
+      }
+
+      // Botão copiar
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(result.qr_code || '').then(() => {
+          copyBtn.textContent = 'Copiado!';
+          setTimeout(() => { copyBtn.textContent = 'Copiar'; }, 2000);
+        });
+      });
+
+      modal.classList.add('visible');
+
+      // Salvar dados para a página de confirmação (quando o Pix for pago)
+      sessionStorage.setItem('inscricao_pix_pending', JSON.stringify({
+        payment_id: result.payment_id,
+        nome: document.getElementById('nome').value.trim(),
+        email: document.getElementById('email').value.trim(),
+      }));
     }
 
     /* ================================================================
