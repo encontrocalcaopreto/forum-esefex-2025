@@ -19,7 +19,7 @@
  */
 
 // ── CONFIGURAÇÃO ──
-const ACCESS_TOKEN = 'APP_USR-2185837793042775-040913-daf41283487c3e88946c709c4709bdcc-3324722401'; // Trocar pelo Access Token real
+const ACCESS_TOKEN = 'APP_USR-1211894729308716-040910-c3e72baa9b946fbb943dc6b3c1599394-1039107041'; // Trocar pelo Access Token real
 const SHEET_ID     = '1Dhj1LvwNzykNN7PSN34m9EQhNl3vXy_aDLqZDIa8elY'; // ID da Google Sheets
 const SHEET_NAME   = 'Inscrições'; // Nome da aba
 
@@ -49,6 +49,9 @@ function doPost(e) {
     } else {
       return ContentService.createTextOutput(JSON.stringify({
         status: paymentResult.status || 'rejected',
+        status_detail: paymentResult.status_detail || '',
+        mp_message: paymentResult.message || '',
+        mp_cause: paymentResult.cause || '',
         message: paymentResult.status_detail || 'Pagamento não aprovado. Tente novamente.'
       })).setMimeType(ContentService.MimeType.JSON);
     }
@@ -56,8 +59,8 @@ function doPost(e) {
   } catch (err) {
     Logger.log('Erro doPost: ' + err.toString());
     return ContentService.createTextOutput(JSON.stringify({
-      status: 'error',
-      message: 'Erro interno. Tente novamente mais tarde.'
+      status: 400,
+      message: 'Erro interno: ' + err.toString()
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
@@ -78,14 +81,23 @@ function doGet(e) {
 function processPayment(paymentData, inscrito, items, total) {
   const url = 'https://api.mercadopago.com/v1/payments';
 
+  Logger.log('paymentData recebido: ' + JSON.stringify(paymentData));
+  Logger.log('total: ' + total);
+
+  // O Brick envia campos extras (selectedPaymentMethod, formData, paymentType)
+  // que a API do MP rejeita. Extrair apenas os campos válidos do formData.
+  const fd = paymentData.formData || paymentData;
+
   const body = {
     transaction_amount: total,
-    token: paymentData.token,
-    installments: paymentData.installments || 1,
-    payment_method_id: paymentData.payment_method_id,
-    issuer_id: paymentData.issuer_id,
+    token: fd.token,
+    installments: fd.installments || 1,
+    payment_method_id: fd.payment_method_id,
+    issuer_id: fd.issuer_id,
+    description: 'Inscrição XIII Fórum Científico da EsEFEx 2026',
+    external_reference: inscrito.cpf.replace(/\D/g, ''),
     payer: {
-      email: inscrito.email,
+      email: (fd.payer && fd.payer.email) || inscrito.email,
       identification: {
         type: 'CPF',
         number: inscrito.cpf.replace(/\D/g, ''),
@@ -93,16 +105,16 @@ function processPayment(paymentData, inscrito, items, total) {
       first_name: inscrito.nome.split(' ')[0],
       last_name: inscrito.nome.split(' ').slice(1).join(' '),
     },
-    description: 'Inscrição XIII Fórum Científico da EsEFEx 2026',
-    external_reference: inscrito.cpf.replace(/\D/g, ''),
   };
 
-  // Para pagamento Pix
-  if (paymentData.payment_method_id === 'pix') {
+  // Para Pix não precisa de token/installments/issuer
+  if (paymentData.paymentType === 'bank_transfer' || fd.payment_method_id === 'pix') {
     delete body.token;
     delete body.installments;
     delete body.issuer_id;
   }
+
+  Logger.log('Body enviado ao MP: ' + JSON.stringify(body));
 
   const options = {
     method: 'post',
@@ -124,6 +136,8 @@ function processPayment(paymentData, inscrito, items, total) {
     status: result.status,
     id: result.id,
     status_detail: result.status_detail,
+    message: result.message,
+    cause: result.cause,
   };
 }
 
