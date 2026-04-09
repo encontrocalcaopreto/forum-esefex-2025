@@ -36,10 +36,20 @@ function doPost(e) {
 
     if (paymentResult.status === 'approved') {
       // 2. Salvar na planilha
-      saveToSheet(inscrito, items, total, paymentResult.id);
+      try {
+        saveToSheet(inscrito, items, total, paymentResult);
+        Logger.log('Planilha salva com sucesso');
+      } catch (sheetErr) {
+        Logger.log('ERRO ao salvar na planilha: ' + sheetErr.toString());
+      }
 
       // 3. Enviar email de confirmação
-      sendConfirmationEmail(inscrito, items, total, paymentResult.id);
+      try {
+        sendConfirmationEmail(inscrito, items, total, paymentResult.id);
+        Logger.log('Email enviado com sucesso');
+      } catch (emailErr) {
+        Logger.log('ERRO ao enviar email: ' + emailErr.toString());
+      }
 
       return ContentService.createTextOutput(JSON.stringify({
         status: 'approved',
@@ -138,13 +148,17 @@ function processPayment(paymentData, inscrito, items, total) {
     status_detail: result.status_detail,
     message: result.message,
     cause: result.cause,
+    payment_method_id: result.payment_method_id,
+    payment_type_id: result.payment_type_id,
+    fee_details: result.fee_details,
+    transaction_details: result.transaction_details,
   };
 }
 
 /**
  * Salvar inscrição na Google Sheets
  */
-function saveToSheet(inscrito, items, total, paymentId) {
+function saveToSheet(inscrito, items, total, paymentResult) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   let sheet = ss.getSheetByName(SHEET_NAME);
 
@@ -162,18 +176,50 @@ function saveToSheet(inscrito, items, total, paymentId) {
       'Instituição',
       'Cidade',
       'Curso',
-      'Ingressos',
-      'Total (R$)',
+      'Ingressos (detalhe)',
+      'Qtd Total',
+      'Total Bruto (R$)',
+      'Forma de Pagamento',
+      'Taxa Estimada (%)',
+      'Taxa Estimada (R$)',
+      'Valor Líquido (R$)',
       'Status Pagamento',
       'ID Pagamento'
     ]);
-    // Formatar cabeçalho
-    sheet.getRange(1, 1, 1, 14).setFontWeight('bold').setBackground('#1a1510').setFontColor('#ff6b1a');
+    sheet.getRange(1, 1, 1, 19).setFontWeight('bold').setBackground('#1a1510').setFontColor('#ff6b1a');
     sheet.setFrozenRows(1);
   }
 
-  // Formatar ingressos como texto legível
-  const ingressosStr = items.map(i => i.tipo + ' ×' + i.quantidade).join(', ');
+  // Formatar ingressos com valores: "Básica ×2 (R$100,00), Experience ×1 (R$180,00)"
+  const ingressosStr = items.map(i =>
+    i.tipo + ' ×' + i.quantidade + ' (R$ ' + (i.preco * i.quantidade).toFixed(2).replace('.', ',') + ')'
+  ).join(', ');
+
+  // Quantidade total de ingressos
+  const qtdTotal = items.reduce((sum, i) => sum + i.quantidade, 0);
+
+  // Determinar forma de pagamento
+  const metodoPagamento = paymentResult.payment_type_id || paymentResult.payment_method_id || 'N/A';
+  let formaPgto = 'Outro';
+  if (metodoPagamento === 'credit_card') formaPgto = 'Cartão de Crédito';
+  else if (metodoPagamento === 'debit_card') formaPgto = 'Cartão de Débito';
+  else if (metodoPagamento === 'bank_transfer' || paymentResult.payment_method_id === 'pix') formaPgto = 'Pix';
+  else if (metodoPagamento === 'account_money') formaPgto = 'Saldo MP';
+
+  // Calcular taxa estimada
+  let taxaPct = 0;
+  if (formaPgto === 'Cartão de Crédito') taxaPct = 4.98;
+  else if (formaPgto === 'Cartão de Débito') taxaPct = 1.99;
+  else if (formaPgto === 'Pix') taxaPct = 0.99;
+
+  // Se o MP retornou fee_details, usar o valor real
+  let taxaReais = total * (taxaPct / 100);
+  if (paymentResult.fee_details && paymentResult.fee_details.length > 0) {
+    taxaReais = paymentResult.fee_details.reduce((sum, f) => sum + (f.amount || 0), 0);
+    taxaPct = (taxaReais / total * 100);
+  }
+
+  const valorLiquido = total - taxaReais;
 
   sheet.appendRow([
     new Date(),
@@ -187,9 +233,14 @@ function saveToSheet(inscrito, items, total, paymentId) {
     inscrito.cidade,
     inscrito.curso,
     ingressosStr,
+    qtdTotal,
     total,
+    formaPgto,
+    Math.round(taxaPct * 100) / 100,
+    Math.round(taxaReais * 100) / 100,
+    Math.round(valorLiquido * 100) / 100,
     'Aprovado',
-    paymentId
+    paymentResult.id
   ]);
 }
 
