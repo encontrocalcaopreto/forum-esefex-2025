@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscrição — XIII Fórum Científico da EsEFEx 2026</title>
+  <meta name="description" content="Inscreva-se no XIII Fórum Científico da Escola de Educação Física do Exército — 11 e 12 de junho de 2026, Rio de Janeiro." />
+  <link rel="icon" type="image/png" href="Logo esefex.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #0e0c0a;
+      --bg-2:        #131008;
+      --bg-card:     #1a1510;
+      --bg-card-h:   #211a12;
+      --border:      rgba(220,120,20,.14);
+      --border-h:    rgba(220,120,20,.40);
+      --fire:        #ff6b1a;
+      --fire-dim:    rgba(255,107,26,.15);
+      --fire-glow:   rgba(255,107,26,.40);
+      --amber:       #f59e0b;
+      --amber-dim:   rgba(245,158,11,.15);
+      --cyan:        #00b4d8;
+      --grad:        linear-gradient(135deg,#ff6b1a 0%,#f59e0b 100%);
+      --grad-subtle: linear-gradient(135deg,rgba(255,107,26,.08) 0%,rgba(245,158,11,.08) 100%);
+      --text:        #f0ebe4;
+      --text-dim:    #9a8a78;
+      --text-muted:  #5a4e42;
+      --font-head:   'Rajdhani', sans-serif;
+      --font-body:   'Inter', sans-serif;
+      --radius:      10px;
+      --radius-lg:   16px;
+      --shadow:      0 8px 32px rgba(0,0,0,.6);
+      --shadow-fire: 0 0 28px rgba(255,107,26,.22);
+      --trans:       .25s ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    .container { width: min(1100px, 100% - 3rem); margin-inline: auto; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #080604;
+      border-bottom: 1px solid var(--border);
+      padding: .9rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .topbar__brand { display: flex; align-items: center; gap: .75rem; }
+    .topbar__logo { height: 36px; width: auto; }
+    .topbar__title {
+      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
+      letter-spacing: .05em; color: var(--text); line-height: 1.2;
+    }
+    .topbar__title span { display: block; font-size: .7rem; font-weight: 400; color: var(--text-dim); letter-spacing: .08em; }
+    .topbar__back {
+      display: flex; align-items: center; gap: .4rem; font-size: .85rem;
+      color: var(--text-dim); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: .4rem .9rem; transition: color var(--trans), border-color var(--trans); white-space: nowrap;
+    }
+    .topbar__back:hover { color: var(--fire); border-color: var(--border-h); }
+
+    /* ── HERO ── */
+    .sub-hero {
+      padding: 3.5rem 0 2.5rem; text-align: center;
+      background: var(--bg-2); border-bottom: 1px solid var(--border);
+    }
+    .sub-hero__badge {
+      display: inline-block; font-family: var(--font-head); font-size: .72rem;
+      font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--fire); background: var(--fire-dim);
+      border: 1px solid rgba(255,107,26,.25); border-radius: 99px;
+      padding: .3rem 1rem; margin-bottom: 1.25rem;
+    }
+    .sub-hero__title {
+      font-family: var(--font-head); font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700; letter-spacing: .04em;
+      background: var(--grad); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: .75rem;
+    }
+    .sub-hero__sub { color: var(--text-dim); font-size: 1rem; max-width: 600px; margin: 0 auto; }
+
+    /* ── TICKET CARDS ── */
+    .tickets { padding: 3rem 0; }
+    .tickets__title {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+      text-align: center; margin-bottom: 2rem; letter-spacing: .04em;
+    }
+    .tickets__grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    }
+    .ticket-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; transition: border-color var(--trans), box-shadow var(--trans);
+      position: relative; overflow: hidden;
+    }
+    .ticket-card:hover { border-color: var(--border-h); }
+    .ticket-card--featured {
+      border-color: var(--fire); box-shadow: var(--shadow-fire);
+    }
+    .ticket-card--premium {
+      border-color: var(--amber);
+      box-shadow: 0 0 28px rgba(245,158,11,.22);
+    }
+    .ticket-card--premium::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--grad);
+    }
+    .ticket-card__badge {
+      font-family: var(--font-head); font-size: .7rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .25rem .8rem; border-radius: 99px; display: inline-block;
+      margin-bottom: 1rem; width: fit-content;
+    }
+    .ticket-card__badge--basic { color: var(--text-dim); background: rgba(154,138,120,.12); border: 1px solid rgba(154,138,120,.25); }
+    .ticket-card__badge--personal { color: var(--fire); background: var(--fire-dim); border: 1px solid rgba(255,107,26,.25); }
+    .ticket-card__badge--premium { color: var(--amber); background: var(--amber-dim); border: 1px solid rgba(245,158,11,.25); }
+    .ticket-card__price {
+      font-family: var(--font-head); font-size: 2.5rem; font-weight: 700;
+      margin-bottom: .25rem; line-height: 1;
+    }
+    .ticket-card__price small { font-size: .9rem; font-weight: 400; color: var(--text-dim); }
+    .ticket-card__desc { color: var(--text-dim); font-size: .85rem; margin-bottom: 1.25rem; }
+    .ticket-card__kit { margin-bottom: 1.5rem; flex: 1; }
+    .ticket-card__kit-title {
+      font-family: var(--font-head); font-size: .8rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: .6rem;
+    }
+    .ticket-card__kit li {
+      font-size: .88rem; padding: .35rem 0; color: var(--text);
+      border-bottom: 1px solid rgba(220,120,20,.06);
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .ticket-card__kit li::before {
+      content: '✓'; color: var(--fire); font-weight: 700; font-size: .75rem;
+    }
+    .ticket-card__kit li:last-child { border-bottom: none; }
+    .ticket-card__kit li.kit-highlight { color: var(--amber); font-weight: 500; }
+
+    /* Quantity selector */
+    .qty-selector {
+      display: flex; align-items: center; gap: 0; margin-top: auto;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; width: fit-content; align-self: center;
+    }
+    .qty-btn {
+      background: var(--bg-card-h); border: none; color: var(--text);
+      font-family: var(--font-head); font-size: 1.2rem; font-weight: 700;
+      width: 42px; height: 42px; cursor: pointer;
+      transition: background var(--trans), color var(--trans);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .qty-btn:hover { background: var(--fire-dim); color: var(--fire); }
+    .qty-btn:disabled { opacity: .3; cursor: default; }
+    .qty-btn:disabled:hover { background: var(--bg-card-h); color: var(--text); }
+    .qty-value {
+      width: 52px; text-align: center; font-family: var(--font-head);
+      font-size: 1.3rem; font-weight: 700; background: transparent;
+      color: var(--text); border: none; border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border); height: 42px;
+    }
+
+    /* ── ORDER SUMMARY ── */
+    .order-summary {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 2rem;
+      margin-top: 2rem; display: none;
+    }
+    .order-summary.visible { display: block; }
+    .order-summary__title {
+      font-family: var(--font-head); font-size: 1.2rem; font-weight: 700;
+      margin-bottom: 1rem; letter-spacing: .04em;
+    }
+    .order-summary__items { margin-bottom: 1rem; }
+    .order-summary__item {
+      display: flex; justify-content: space-between; padding: .5rem 0;
+      border-bottom: 1px solid rgba(220,120,20,.06); font-size: .92rem;
+    }
+    .order-summary__item:last-child { border-bottom: none; }
+    .order-summary__total {
+      display: flex; justify-content: space-between; padding-top: 1rem;
+      border-top: 1px solid var(--border-h);
+      font-family: var(--font-head); font-size: 1.4rem; font-weight: 700;
+    }
+    .order-summary__total span:last-child { color: var(--fire); }
+
+    /* ── FORM ── */
+    .form-section {
+      padding: 2rem 0 1rem; display: none;
+    }
+    .form-section.visible { display: block; }
+    .form-section__title {
+      font-family: var(--font-head); font-size: 1.3rem; font-weight: 700;
+      margin-bottom: 1.5rem; letter-spacing: .04em;
+    }
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .form-group { display: flex; flex-direction: column; gap: .35rem; }
+    .form-group--full { grid-column: 1 / -1; }
+    .form-group label {
+      font-family: var(--font-head); font-size: .8rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim);
+    }
+    .form-group label .req { color: var(--fire); }
+    .form-group input,
+    .form-group select {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: .7rem 1rem;
+      color: var(--text); font-family: var(--font-body); font-size: .92rem;
+      transition: border-color var(--trans);
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none; border-color: var(--fire);
+      box-shadow: 0 0 0 3px var(--fire-dim);
+    }
+    .form-group input::placeholder { color: var(--text-muted); }
+    .form-group select { cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a8a78' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+    .form-group select option { background: var(--bg-card); color: var(--text); }
+
+    /* ── PAYMENT ── */
+    .payment-section {
+      padding: 2rem 0 3rem; display: none;
+    }
+    .payment-section.visible { display: block; }
+    .payment-section__title {
+      font-family: var(--font-head); font-size: 1.3rem; font-weight: 700;
+      margin-bottom: .5rem; letter-spacing: .04em;
+    }
+    .payment-section__sub {
+      color: var(--text-dim); font-size: .88rem; margin-bottom: 1.5rem;
+    }
+    #payment-brick-container {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.5rem; min-height: 300px;
+    }
+
+    /* ── NOTICE ── */
+    .notice {
+      text-align: center; padding: 2rem 0; color: var(--text-dim); font-size: .85rem;
+    }
+    .notice strong { color: var(--fire); }
+
+    /* ── PROCESSING OVERLAY ── */
+    .processing-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(14,12,10,.92); z-index: 999;
+      flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
+    }
+    .processing-overlay.visible { display: flex; }
+    .spinner {
+      width: 48px; height: 48px; border: 3px solid var(--border);
+      border-top-color: var(--fire); border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .processing-overlay p {
+      font-family: var(--font-head); font-size: 1.2rem; font-weight: 600;
+      letter-spacing: .04em;
+    }
+
+    /* ── ERROR / SUCCESS MESSAGES ── */
+    .msg {
+      padding: 1rem 1.5rem; border-radius: var(--radius); margin-top: 1rem;
+      font-size: .9rem; display: none;
+    }
+    .msg.visible { display: block; }
+    .msg--error { background: rgba(220,38,38,.12); border: 1px solid rgba(220,38,38,.3); color: #fca5a5; }
+    .msg--success { background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3); color: #86efac; }
+
+    /* ── FOOTER ── */
+    .sub-footer {
+      background: #080604; border-top: 1px solid var(--border);
+      padding: 2rem 0; text-align: center;
+      color: var(--text-muted); font-size: .8rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .tickets__grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+      .form-grid { grid-template-columns: 1fr; }
+      .ticket-card { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="container">
+      <div class="topbar__inner">
+        <a href="index.html" class="topbar__brand">
+          <img src="Logo esefex.png" alt="EsEFEx" class="topbar__logo" />
+          <div class="topbar__title">
+            XIII Fórum Científico
+            <span>Escola de Educação Física do Exército</span>
+          </div>
+        </a>
+        <a href="index.html" class="topbar__back">← Voltar ao site</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section class="sub-hero">
+    <div class="container">
+      <span class="sub-hero__badge">Inscrições Abertas</span>
+      <h1 class="sub-hero__title">Inscrição</h1>
+      <p class="sub-hero__sub">Garanta sua vaga no XIII Fórum Científico da EsEFEx — 11 e 12 de junho de 2026, Rio de Janeiro.</p>
+    </div>
+  </section>
+
+  <!-- ── TICKETS ── -->
+  <section class="tickets">
+    <div class="container">
+      <h2 class="tickets__title">Escolha seu Ingresso</h2>
+
+      <div class="tickets__grid">
+
+        <!-- BÁSICA -->
+        <div class="ticket-card" data-ticket="basica" data-price="50">
+          <span class="ticket-card__badge ticket-card__badge--basic">Básica</span>
+          <div class="ticket-card__price">R$ 50<small>,00</small></div>
+          <p class="ticket-card__desc">Ingresso com kit essencial do evento.</p>
+          <div class="ticket-card__kit">
+            <p class="ticket-card__kit-title">Kit incluso</p>
+            <ul>
+              <li>Livro do Fórum</li>
+              <li>Sachê Liquidz</li>
+              <li>Bloco e caneta</li>
+            </ul>
+          </div>
+          <div class="qty-selector">
+            <button class="qty-btn qty-minus" disabled>−</button>
+            <input type="text" class="qty-value" value="0" readonly />
+            <button class="qty-btn qty-plus">+</button>
+          </div>
+        </div>
+
+        <!-- PERSONALIZADA -->
+        <div class="ticket-card ticket-card--featured" data-ticket="personalizada" data-price="80">
+          <span class="ticket-card__badge ticket-card__badge--personal">Personalizada</span>
+          <div class="ticket-card__price">R$ 80<small>,00</small></div>
+          <p class="ticket-card__desc">Kit completo + item exclusivo EsEFEx.</p>
+          <div class="ticket-card__kit">
+            <p class="ticket-card__kit-title">Kit incluso</p>
+            <ul>
+              <li>Livro do Fórum</li>
+              <li>Sachê Liquidz</li>
+              <li>Bloco e caneta</li>
+              <li class="kit-highlight">Garrafa de alumínio EsEFEx</li>
+            </ul>
+          </div>
+          <div class="qty-selector">
+            <button class="qty-btn qty-minus" disabled>−</button>
+            <input type="text" class="qty-value" value="0" readonly />
+            <button class="qty-btn qty-plus">+</button>
+          </div>
+        </div>
+
+        <!-- EXPERIENCE HYROX -->
+        <div class="ticket-card ticket-card--premium" data-ticket="experience" data-price="180">
+          <span class="ticket-card__badge ticket-card__badge--premium">Experience Hyrox</span>
+          <div class="ticket-card__price">R$ 180<small>,00</small></div>
+          <p class="ticket-card__desc">Experiência completa + camisa exclusiva Hyrox.</p>
+          <div class="ticket-card__kit">
+            <p class="ticket-card__kit-title">Kit incluso</p>
+            <ul>
+              <li>Livro do Fórum</li>
+              <li>Sachê Liquidz</li>
+              <li>Bloco e caneta</li>
+              <li>Garrafa de alumínio EsEFEx</li>
+              <li class="kit-highlight">Camisa Hyrox Experience</li>
+            </ul>
+          </div>
+          <div class="qty-selector">
+            <button class="qty-btn qty-minus" disabled>−</button>
+            <input type="text" class="qty-value" value="0" readonly />
+            <button class="qty-btn qty-plus">+</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ORDER SUMMARY -->
+      <div class="order-summary" id="orderSummary">
+        <h3 class="order-summary__title">Resumo do Pedido</h3>
+        <div class="order-summary__items" id="orderItems"></div>
+        <div class="order-summary__total">
+          <span>Total</span>
+          <span id="orderTotal">R$ 0,00</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FORM ── -->
+  <section class="form-section" id="formSection">
+    <div class="container">
+      <h2 class="form-section__title">Dados do Inscrito</h2>
+      <form id="inscricaoForm" class="form-grid" autocomplete="on">
+        <div class="form-group form-group--full">
+          <label for="nome">Nome completo <span class="req">*</span></label>
+          <input type="text" id="nome" name="nome" required placeholder="Seu nome completo" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email <span class="req">*</span></label>
+          <input type="email" id="email" name="email" required placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label for="cpf">CPF <span class="req">*</span></label>
+          <input type="text" id="cpf" name="cpf" required placeholder="000.000.000-00" maxlength="14" />
+        </div>
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="text" id="telefone" name="telefone" placeholder="(00) 00000-0000" maxlength="15" />
+        </div>
+        <div class="form-group">
+          <label for="formacao">Formação acadêmica <span class="req">*</span></label>
+          <select id="formacao" name="formacao" required>
+            <option value="">Selecione...</option>
+            <option value="Graduação">Graduação</option>
+            <option value="Especialização">Especialização</option>
+            <option value="Mestrado">Mestrado</option>
+            <option value="Doutorado">Doutorado</option>
+            <option value="Pós-Doutorado">Pós-Doutorado</option>
+            <option value="Ensino Médio">Ensino Médio</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="vinculo">Vínculo institucional <span class="req">*</span></label>
+          <select id="vinculo" name="vinculo" required>
+            <option value="">Selecione...</option>
+            <option value="Docente">Docente</option>
+            <option value="Discente">Discente</option>
+            <option value="Militar">Militar</option>
+            <option value="Pesquisador">Pesquisador</option>
+            <option value="Profissional de Educação Física">Profissional de Educação Física</option>
+            <option value="Profissional de Saúde">Profissional de Saúde</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="instituicao">Instituição de ensino <span class="req">*</span></label>
+          <input type="text" id="instituicao" name="instituicao" required placeholder="Ex: UFRJ, EsEFEx, USP..." />
+        </div>
+        <div class="form-group">
+          <label for="cidade">Cidade da instituição <span class="req">*</span></label>
+          <input type="text" id="cidade" name="cidade" required placeholder="Ex: Rio de Janeiro" />
+        </div>
+        <div class="form-group form-group--full">
+          <label for="curso">Curso <span class="req">*</span></label>
+          <input type="text" id="curso" name="curso" required placeholder="Ex: Educação Física, Fisioterapia..." />
+        </div>
+      </form>
+      <div class="msg msg--error" id="formError"></div>
+    </div>
+  </section>
+
+  <!-- ── PAYMENT ── -->
+  <section class="payment-section" id="paymentSection">
+    <div class="container">
+      <h2 class="payment-section__title">Pagamento</h2>
+      <p class="payment-section__sub">Escolha a forma de pagamento. Aceitamos Pix, cartão de crédito e débito.</p>
+      <div id="payment-brick-container"></div>
+      <div class="msg msg--error" id="paymentError"></div>
+    </div>
+  </section>
+
+  <!-- ── NOTICE ── -->
+  <div class="notice">
+    <div class="container">
+      <p>Inscrições abertas até <strong>12/06/2026</strong> — Vagas limitadas</p>
+    </div>
+  </div>
+
+  <!-- ── PROCESSING OVERLAY ── -->
+  <div class="processing-overlay" id="processingOverlay">
+    <div class="spinner"></div>
+    <p>Processando pagamento...</p>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer class="sub-footer">
+    <div class="container">
+      <p>&copy; 2026 Escola de Educação Física do Exército — XIII Fórum Científico</p>
+    </div>
+  </footer>
+
+  <!-- ── MERCADO PAGO SDK ── -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+  <script>
+    /* ================================================================
+       CONFIG — SUBSTITUIR COM SUAS CREDENCIAIS
+    ================================================================ */
+    const CONFIG = {
+      MP_PUBLIC_KEY: 'APP_USR-dcd591e8-149b-4fdd-8d8f-693893965e76',
+      BACKEND_URL: 'https://script.google.com/macros/s/AKfycbxJNT7l1Za1LfQUOZfvXpXbBC0F_lLg7jHZPt_GZ43E8ZxnbyK2V32hn-G80vpYYvU/exec', // Trocar pela URL do Apps Script
+    };
+
+    /* ================================================================
+       TICKET DATA
+    ================================================================ */
+    const TICKETS = {
+      basica:       { name: 'Inscrição Básica',           price: 50 },
+      personalizada:{ name: 'Inscrição Personalizada',    price: 80 },
+      experience:   { name: 'Inscrição Experience Hyrox', price: 180 },
+    };
+
+    /* ================================================================
+       STATE
+    ================================================================ */
+    const state = {
+      quantities: { basica: 0, personalizada: 0, experience: 0 },
+      total: 0,
+      brickController: null,
+    };
+
+    /* ================================================================
+       DOM REFS
+    ================================================================ */
+    const orderSummary   = document.getElementById('orderSummary');
+    const orderItems     = document.getElementById('orderItems');
+    const orderTotal     = document.getElementById('orderTotal');
+    const formSection    = document.getElementById('formSection');
+    const paymentSection = document.getElementById('paymentSection');
+    const formEl         = document.getElementById('inscricaoForm');
+    const formError      = document.getElementById('formError');
+    const paymentError   = document.getElementById('paymentError');
+    const overlay        = document.getElementById('processingOverlay');
+
+    /* ================================================================
+       QUANTITY SELECTORS
+    ================================================================ */
+    document.querySelectorAll('.ticket-card').forEach(card => {
+      const key     = card.dataset.ticket;
+      const minus   = card.querySelector('.qty-minus');
+      const plus    = card.querySelector('.qty-plus');
+      const display = card.querySelector('.qty-value');
+
+      plus.addEventListener('click', () => {
+        if (state.quantities[key] < 10) {
+          state.quantities[key]++;
+          display.value = state.quantities[key];
+          minus.disabled = false;
+          updateOrder();
+        }
+      });
+
+      minus.addEventListener('click', () => {
+        if (state.quantities[key] > 0) {
+          state.quantities[key]--;
+          display.value = state.quantities[key];
+          minus.disabled = state.quantities[key] === 0;
+          updateOrder();
+        }
+      });
+    });
+
+    function updateOrder() {
+      let total = 0;
+      let hasItems = false;
+      let html = '';
+
+      for (const [key, qty] of Object.entries(state.quantities)) {
+        if (qty > 0) {
+          hasItems = true;
+          const t = TICKETS[key];
+          const sub = t.price * qty;
+          total += sub;
+          html += `<div class="order-summary__item">
+            <span>${t.name} × ${qty}</span>
+            <span>R$ ${sub.toFixed(2).replace('.', ',')}</span>
+          </div>`;
+        }
+      }
+
+      state.total = total;
+      orderItems.innerHTML = html;
+      orderTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
+      orderSummary.classList.toggle('visible', hasItems);
+      formSection.classList.toggle('visible', hasItems);
+
+      if (!hasItems) {
+        paymentSection.classList.remove('visible');
+        if (state.brickController) {
+          state.brickController.unmount();
+          state.brickController = null;
+        }
+      }
+    }
+
+    /* ================================================================
+       CPF MASK & VALIDATION
+    ================================================================ */
+    const cpfInput = document.getElementById('cpf');
+    cpfInput.addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+      else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+      else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+      e.target.value = v;
+    });
+
+    function validarCPF(cpf) {
+      cpf = cpf.replace(/\D/g, '');
+      if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+      for (let t = 9; t < 11; t++) {
+        let d = 0;
+        for (let c = 0; c < t; c++) d += parseInt(cpf.charAt(c)) * ((t + 1) - c);
+        d = ((10 * d) % 11) % 10;
+        if (parseInt(cpf.charAt(t)) !== d) return false;
+      }
+      return true;
+    }
+
+    /* ================================================================
+       PHONE MASK
+    ================================================================ */
+    const phoneInput = document.getElementById('telefone');
+    phoneInput.addEventListener('input', e => {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 6) v = v.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
+      else if (v.length > 2) v = v.replace(/(\d{2})(\d{1,5})/, '($1) $2');
+      e.target.value = v;
+    });
+
+    /* ================================================================
+       FORM VALIDATION + PAYMENT INIT
+    ================================================================ */
+    let brickInitializing = false;
+
+    formEl.addEventListener('input', () => {
+      const allFilled = formEl.checkValidity();
+      const cpfValid = validarCPF(cpfInput.value);
+
+      if (allFilled && cpfValid && state.total > 0) {
+        paymentSection.classList.add('visible');
+        if (!state.brickController && !brickInitializing) initPaymentBrick();
+      }
+    });
+
+    /* ================================================================
+       MERCADO PAGO BRICKS
+    ================================================================ */
+    let mp = null;
+
+    async function initPaymentBrick() {
+      if (state.brickController || brickInitializing) return;
+      brickInitializing = true;
+
+      // Limpar container para evitar duplicação
+      const container = document.getElementById('payment-brick-container');
+      container.innerHTML = '';
+
+      try {
+        if (!mp) {
+          mp = new MercadoPago(CONFIG.MP_PUBLIC_KEY, { locale: 'pt-BR' });
+        }
+      } catch (err) {
+        brickInitializing = false;
+        showError(paymentError, 'Erro ao carregar Mercado Pago. Verifique a Public Key.');
+        return;
+      }
+
+      try {
+        const bricksBuilder = mp.bricks();
+        const controller = await bricksBuilder.create('payment', 'payment-brick-container', {
+          initialization: {
+            amount: state.total,
+          },
+          customization: {
+            visual: {
+              style: {
+                theme: 'dark',
+                customVariables: {
+                  formBackgroundColor: '#1a1510',
+                  baseColor: '#ff6b1a',
+                }
+              }
+            },
+            paymentMethods: {
+              bankTransfer: 'all',
+              creditCard: 'all',
+              debitCard: 'all',
+            }
+          },
+          callbacks: {
+            onReady: () => {},
+            onSubmit: async (cardFormData) => {
+              await processPayment(cardFormData);
+            },
+            onError: (error) => {
+              console.error('Brick error:', error);
+            },
+          },
+        });
+        state.brickController = controller;
+      } catch (err) {
+        console.error('Brick init error:', err);
+        showError(paymentError, 'Não foi possível inicializar o pagamento. Recarregue a página.');
+      } finally {
+        brickInitializing = false;
+      }
+    }
+
+    /* ================================================================
+       PROCESS PAYMENT
+    ================================================================ */
+    async function processPayment(paymentData) {
+      overlay.classList.add('visible');
+      hideError(paymentError);
+
+      // Collect form data
+      const formData = {
+        nome:        document.getElementById('nome').value.trim(),
+        email:       document.getElementById('email').value.trim(),
+        cpf:         document.getElementById('cpf').value.trim(),
+        telefone:    document.getElementById('telefone').value.trim(),
+        formacao:    document.getElementById('formacao').value,
+        vinculo:     document.getElementById('vinculo').value,
+        instituicao: document.getElementById('instituicao').value.trim(),
+        cidade:      document.getElementById('cidade').value.trim(),
+        curso:       document.getElementById('curso').value.trim(),
+      };
+
+      // Build items list
+      const items = [];
+      for (const [key, qty] of Object.entries(state.quantities)) {
+        if (qty > 0) {
+          items.push({ tipo: TICKETS[key].name, quantidade: qty, preco: TICKETS[key].price });
+        }
+      }
+
+      const payload = {
+        paymentData,
+        inscrito: formData,
+        items,
+        total: state.total,
+      };
+
+      try {
+        const resp = await fetch(CONFIG.BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await resp.json();
+
+        if (result.status === 'approved') {
+          sessionStorage.setItem('inscricao_data', JSON.stringify({
+            nome: formData.nome,
+            email: formData.email,
+            items,
+            total: state.total,
+            paymentId: result.payment_id,
+          }));
+          window.location.href = 'inscricao-confirmada.html';
+        } else {
+          overlay.classList.remove('visible');
+          const msg = result.message || 'Pagamento não aprovado. Tente outra forma de pagamento.';
+          showError(paymentError, msg);
+          console.log('Payment response:', result);
+        }
+      } catch (err) {
+        overlay.classList.remove('visible');
+        console.error('Backend error:', err);
+        showError(paymentError, 'Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
+      }
+    }
+
+    /* ================================================================
+       HELPERS
+    ================================================================ */
+    function showError(el, msg) { el.textContent = msg; el.classList.add('visible'); }
+    function hideError(el) { el.textContent = ''; el.classList.remove('visible'); }
+  </script>
+
+</body>
+</html>

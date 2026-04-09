@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscrição Confirmada — XIII Fórum Científico da EsEFEx</title>
+  <meta name="description" content="Sua inscrição no XIII Fórum Científico da EsEFEx foi confirmada com sucesso." />
+  <link rel="icon" type="image/png" href="Logo esefex.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #0e0c0a;
+      --bg-2:        #131008;
+      --bg-card:     #1a1510;
+      --bg-card-h:   #211a12;
+      --border:      rgba(220,120,20,.14);
+      --border-h:    rgba(220,120,20,.40);
+      --fire:        #ff6b1a;
+      --fire-dim:    rgba(255,107,26,.15);
+      --amber:       #f59e0b;
+      --green:       #22c55e;
+      --green-dim:   rgba(34,197,94,.12);
+      --grad:        linear-gradient(135deg,#ff6b1a 0%,#f59e0b 100%);
+      --text:        #f0ebe4;
+      --text-dim:    #9a8a78;
+      --text-muted:  #5a4e42;
+      --font-head:   'Rajdhani', sans-serif;
+      --font-body:   'Inter', sans-serif;
+      --radius:      10px;
+      --radius-lg:   16px;
+      --shadow:      0 8px 32px rgba(0,0,0,.6);
+      --trans:       .25s ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(700px, 100% - 3rem); margin-inline: auto; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #080604;
+      border-bottom: 1px solid var(--border);
+      padding: .9rem 0;
+    }
+    .topbar__inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .topbar__brand { display: flex; align-items: center; gap: .75rem; }
+    .topbar__logo { height: 36px; width: auto; }
+    .topbar__title {
+      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
+      letter-spacing: .05em; color: var(--text); line-height: 1.2;
+    }
+    .topbar__title span { display: block; font-size: .7rem; font-weight: 400; color: var(--text-dim); letter-spacing: .08em; }
+
+    /* ── CONTENT ── */
+    .confirm {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 4rem 0;
+    }
+    .confirm__card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 3rem 2.5rem;
+      text-align: center; max-width: 600px; width: 100%;
+    }
+    .confirm__icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: var(--green-dim); border: 2px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .confirm__icon svg { width: 40px; height: 40px; stroke: var(--green); }
+    .confirm__title {
+      font-family: var(--font-head); font-size: 2rem; font-weight: 700;
+      letter-spacing: .04em; margin-bottom: .5rem;
+      background: var(--grad); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .confirm__sub {
+      color: var(--text-dim); font-size: 1rem; margin-bottom: 2rem;
+    }
+
+    /* Summary */
+    .confirm__summary {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      text-align: left; margin-bottom: 2rem;
+    }
+    .confirm__summary-title {
+      font-family: var(--font-head); font-size: .85rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+    .confirm__row {
+      display: flex; justify-content: space-between; padding: .45rem 0;
+      font-size: .9rem; border-bottom: 1px solid rgba(220,120,20,.06);
+    }
+    .confirm__row:last-child { border-bottom: none; }
+    .confirm__row-label { color: var(--text-dim); }
+    .confirm__row-value { font-weight: 500; }
+    .confirm__row--total {
+      border-top: 1px solid var(--border-h); margin-top: .5rem; padding-top: .75rem;
+      font-family: var(--font-head); font-size: 1.1rem; font-weight: 700;
+    }
+    .confirm__row--total .confirm__row-value { color: var(--fire); }
+
+    .confirm__email-notice {
+      background: var(--fire-dim); border: 1px solid rgba(255,107,26,.2);
+      border-radius: var(--radius); padding: .8rem 1.2rem;
+      font-size: .85rem; color: var(--text); margin-bottom: 2rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .confirm__email-notice svg { flex-shrink: 0; width: 20px; height: 20px; stroke: var(--fire); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: var(--font-head); font-size: .9rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      border-radius: var(--radius); padding: .75rem 2rem;
+      border: none; cursor: pointer; transition: all var(--trans);
+      background: var(--grad); color: #fff;
+      box-shadow: 0 4px 20px rgba(255,107,26,.35);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(255,107,26,.45); }
+
+    /* ── FOOTER ── */
+    .sub-footer {
+      background: #080604; border-top: 1px solid var(--border);
+      padding: 2rem 0; text-align: center;
+      color: var(--text-muted); font-size: .8rem;
+    }
+
+    /* ── NO DATA STATE ── */
+    .confirm__nodata {
+      color: var(--text-dim); font-size: 1rem;
+      padding: 2rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="container">
+      <div class="topbar__inner">
+        <a href="index.html" class="topbar__brand">
+          <img src="Logo esefex.png" alt="EsEFEx" class="topbar__logo" />
+          <div class="topbar__title">
+            XIII Fórum Científico
+            <span>Escola de Educação Física do Exército</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── CONFIRM ── -->
+  <main class="confirm">
+    <div class="confirm__card" id="confirmCard">
+      <div class="confirm__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+      <h1 class="confirm__title">Inscrição Confirmada!</h1>
+      <p class="confirm__sub" id="confirmSub">Obrigado por se inscrever no XIII Fórum Científico da EsEFEx.</p>
+
+      <div class="confirm__summary" id="confirmSummary">
+        <p class="confirm__summary-title">Resumo da inscrição</p>
+        <div id="summaryRows"></div>
+      </div>
+
+      <div class="confirm__email-notice">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <polyline points="22,4 12,13 2,4" />
+        </svg>
+        <span>Você receberá um email de confirmação com os detalhes da sua inscrição.</span>
+      </div>
+
+      <a href="index.html" class="btn">← Voltar ao site</a>
+    </div>
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="sub-footer">
+    <div class="container">
+      <p>&copy; 2026 Escola de Educação Física do Exército — XIII Fórum Científico</p>
+    </div>
+  </footer>
+
+  <script>
+    const data = JSON.parse(sessionStorage.getItem('inscricao_data') || 'null');
+    const summaryRows = document.getElementById('summaryRows');
+    const confirmSub  = document.getElementById('confirmSub');
+
+    if (data) {
+      confirmSub.textContent = `Obrigado, ${data.nome.split(' ')[0]}! Sua inscrição no XIII Fórum Científico da EsEFEx foi confirmada.`;
+
+      let html = '';
+      html += `<div class="confirm__row"><span class="confirm__row-label">Nome</span><span class="confirm__row-value">${data.nome}</span></div>`;
+      html += `<div class="confirm__row"><span class="confirm__row-label">Email</span><span class="confirm__row-value">${data.email}</span></div>`;
+
+      data.items.forEach(item => {
+        html += `<div class="confirm__row"><span class="confirm__row-label">${item.tipo} × ${item.quantidade}</span><span class="confirm__row-value">R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}</span></div>`;
+      });
+
+      html += `<div class="confirm__row confirm__row--total"><span class="confirm__row-label">Total pago</span><span class="confirm__row-value">R$ ${data.total.toFixed(2).replace('.', ',')}</span></div>`;
+
+      if (data.paymentId) {
+        html += `<div class="confirm__row"><span class="confirm__row-label">ID do pagamento</span><span class="confirm__row-value">#${data.paymentId}</span></div>`;
+      }
+
+      summaryRows.innerHTML = html;
+      sessionStorage.removeItem('inscricao_data');
+    } else {
+      document.getElementById('confirmSummary').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
