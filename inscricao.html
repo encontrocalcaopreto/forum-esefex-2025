@@ -892,6 +892,7 @@
         });
 
         const result = await resp.json();
+        console.log('Full backend response:', JSON.stringify(result));
 
         if (result.status === 'approved') {
           sessionStorage.setItem('inscricao_data', JSON.stringify({
@@ -903,9 +904,10 @@
           }));
           window.location.href = 'inscricao-confirmada.html';
 
-        } else if (result.status === 'pending_pix') {
+        } else if (result.status === 'pending_pix' || result.qr_code || result.qr_code_base64) {
           // Pix: mostrar QR Code na tela
           overlay.classList.remove('visible');
+          console.log('Pix response:', result);
           showPixModal(result);
 
         } else {
