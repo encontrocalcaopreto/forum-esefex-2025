@@ -147,6 +147,31 @@
       color: var(--text-dim); font-size: 1rem;
       padding: 2rem 0;
     }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .container { width: calc(100% - 2rem); }
+      .topbar__title { font-size: .85rem; }
+      .topbar__title span { font-size: .6rem; }
+      .topbar__logo { height: 28px; }
+      .confirm { padding: 2rem 0; }
+      .confirm__card { padding: 2rem 1.25rem; }
+      .confirm__icon { width: 64px; height: 64px; }
+      .confirm__icon svg { width: 32px; height: 32px; }
+      .confirm__title { font-size: 1.6rem; }
+      .confirm__sub { font-size: .9rem; }
+      .confirm__summary { padding: 1.25rem; }
+      .confirm__row { flex-wrap: wrap; gap: .25rem; font-size: .85rem; }
+      .confirm__row--total { font-size: 1rem; }
+      .confirm__email-notice { font-size: .8rem; flex-direction: column; text-align: center; gap: .4rem; }
+      .btn { font-size: .8rem; padding: .65rem 1.5rem; }
+    }
+
+    @media (max-width: 380px) {
+      .confirm__card { padding: 1.5rem 1rem; }
+      .confirm__title { font-size: 1.4rem; }
+      .topbar__title span { display: none; }
+    }
   </style>
 </head>
 <body>

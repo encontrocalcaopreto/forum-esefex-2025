@@ -357,6 +357,35 @@
       .tickets__grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
       .form-grid { grid-template-columns: 1fr; }
       .ticket-card { padding: 1.5rem 1.25rem; }
+      .topbar__title { font-size: .85rem; }
+      .topbar__title span { font-size: .6rem; }
+      .topbar__back { font-size: .75rem; padding: .35rem .7rem; }
+      .topbar__logo { height: 28px; }
+      .sub-hero { padding: 2.5rem 0 2rem; }
+      .sub-hero__title { font-size: 1.8rem; }
+      .sub-hero__sub { font-size: .88rem; }
+      .tickets { padding: 2rem 0; }
+      .tickets__title { font-size: 1.25rem; }
+      .ticket-card__price { font-size: 2rem; }
+      .order-summary { padding: 1.5rem 1.25rem; }
+      .form-section__title { font-size: 1.1rem; }
+      .payment-section__title { font-size: 1.1rem; }
+      #payment-brick-container { padding: 1rem; }
+      .pix-modal { padding: 1rem; }
+      .pix-modal__card { padding: 2rem 1.25rem; }
+      .pix-modal__qr img { width: 180px; height: 180px; }
+      .pix-modal__code { font-size: .65rem; }
+      .pix-modal__code-wrap { flex-direction: column; }
+      .pix-modal__copy-btn { width: 100%; text-align: center; }
+    }
+
+    @media (max-width: 380px) {
+      .container { width: calc(100% - 2rem); }
+      .topbar__title span { display: none; }
+      .ticket-card__price { font-size: 1.8rem; }
+      .qty-btn { width: 38px; height: 38px; }
+      .qty-value { width: 44px; height: 38px; font-size: 1.1rem; }
+      .pix-modal__qr img { width: 160px; height: 160px; }
     }
   </style>
 </head>
@@ -693,6 +722,15 @@
         if (state.brickController) {
           state.brickController.unmount();
           state.brickController = null;
+        }
+      } else if (state.brickController) {
+        // Total mudou — destruir brick para recriar com novo valor
+        state.brickController.unmount();
+        state.brickController = null;
+        brickInitializing = false;
+        // Se o formulário já está válido, recriar o brick
+        if (formEl.checkValidity() && validarCPF(cpfInput.value)) {
+          initPaymentBrick();
         }
       }
     }
