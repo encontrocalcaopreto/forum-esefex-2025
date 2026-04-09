@@ -135,13 +135,24 @@ function doGet(e) {
 
                 // Montar items a partir da string de ingressos
                 const items = [];
+                const totalNum = parseFloat(String(total).replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
                 const partes = ingressosStr.split(', ');
                 partes.forEach(p => {
-                  const match = p.match(/(.+?) ×(\d+)/);
+                  const match = p.match(/(.+?) ×(\d+)(?: \(R\$ ([\d.,]+)\))?/);
                   if (match) {
-                    items.push({ tipo: match[1], quantidade: parseInt(match[2]), preco: 0 });
+                    const qty = parseInt(match[2]);
+                    let preco = 0;
+                    if (match[3]) {
+                      const subtotal = parseFloat(match[3].replace('.', '').replace(',', '.'));
+                      preco = qty > 0 ? subtotal / qty : 0;
+                    }
+                    items.push({ tipo: match[1], quantidade: qty, preco: preco });
                   }
                 });
+                // Fallback: se nenhum preço foi extraído e há apenas 1 item, usar o total
+                if (items.length === 1 && items[0].preco === 0 && totalNum > 0) {
+                  items[0].preco = totalNum / items[0].quantidade;
+                }
 
                 try {
                   sendConfirmationEmail({ nome: nome, email: email }, items, total, paymentId);
