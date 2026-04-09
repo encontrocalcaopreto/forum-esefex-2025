@@ -102,6 +102,76 @@ function doPost(e) {
  * Permitir CORS preflight
  */
 function doGet(e) {
+  // Verificar status de pagamento Pix
+  if (e && e.parameter && e.parameter.action === 'check_payment' && e.parameter.id) {
+    try {
+      const paymentId = e.parameter.id;
+      const url = 'https://api.mercadopago.com/v1/payments/' + paymentId;
+      const options = {
+        method: 'get',
+        headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+        muteHttpExceptions: true,
+      };
+      const response = UrlFetchApp.fetch(url, options);
+      const result = JSON.parse(response.getContentText());
+
+      // Se pagou, atualizar planilha e enviar email
+      if (result.status === 'approved') {
+        try {
+          const ss = SpreadsheetApp.openById(SHEET_ID);
+          const sheet = ss.getSheetByName(SHEET_NAME);
+          if (sheet) {
+            const data = sheet.getDataRange().getValues();
+            for (let i = data.length - 1; i >= 1; i--) {
+              if (String(data[i][18]) === String(paymentId) && data[i][17] === 'Aguardando Pix') {
+                sheet.getRange(i + 1, 18).setValue('Aprovado');
+                Logger.log('Planilha atualizada para Aprovado: ' + paymentId);
+
+                // Enviar email de confirmação
+                const nome = data[i][1];
+                const email = data[i][2];
+                const ingressosStr = data[i][10];
+                const total = data[i][12];
+
+                // Montar items a partir da string de ingressos
+                const items = [];
+                const partes = ingressosStr.split(', ');
+                partes.forEach(p => {
+                  const match = p.match(/(.+?) ×(\d+)/);
+                  if (match) {
+                    items.push({ tipo: match[1], quantidade: parseInt(match[2]), preco: 0 });
+                  }
+                });
+
+                try {
+                  sendConfirmationEmail({ nome: nome, email: email }, items, total, paymentId);
+                  Logger.log('Email Pix enviado para: ' + email);
+                } catch (emailErr) {
+                  Logger.log('Erro email Pix: ' + emailErr.toString());
+                }
+
+                break;
+              }
+            }
+          }
+        } catch (sheetErr) {
+          Logger.log('Erro ao atualizar planilha Pix: ' + sheetErr.toString());
+        }
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        status: result.status,
+        payment_id: paymentId,
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      Logger.log('Erro check_payment: ' + err.toString());
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'error',
+        message: err.toString(),
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
   return ContentService.createTextOutput(JSON.stringify({
     status: 'ok',
     message: 'Backend do XIII Fórum Científico da EsEFEx ativo.'

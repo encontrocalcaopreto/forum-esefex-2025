@@ -952,12 +952,44 @@
 
       modal.classList.add('visible');
 
-      // Salvar dados para a página de confirmação (quando o Pix for pago)
-      sessionStorage.setItem('inscricao_pix_pending', JSON.stringify({
-        payment_id: result.payment_id,
+      // Montar dados para confirmação
+      const pixFormData = {
         nome: document.getElementById('nome').value.trim(),
         email: document.getElementById('email').value.trim(),
-      }));
+      };
+      const pixItems = [];
+      for (const [key, qty] of Object.entries(state.quantities)) {
+        if (qty > 0) {
+          pixItems.push({ tipo: TICKETS[key].name, quantidade: qty, preco: TICKETS[key].price });
+        }
+      }
+
+      // Verificar pagamento a cada 5 segundos
+      const pixCheckInterval = setInterval(async () => {
+        try {
+          const checkResp = await fetch(CONFIG.BACKEND_URL + '?action=check_payment&id=' + result.payment_id);
+          const checkResult = await checkResp.json();
+
+          if (checkResult.status === 'approved') {
+            clearInterval(pixCheckInterval);
+
+            sessionStorage.setItem('inscricao_data', JSON.stringify({
+              nome: pixFormData.nome,
+              email: pixFormData.email,
+              items: pixItems,
+              total: state.total,
+              paymentId: result.payment_id,
+            }));
+
+            window.location.href = 'inscricao-confirmada.html';
+          }
+        } catch (err) {
+          console.log('Pix check error:', err);
+        }
+      }, 5000);
+
+      // Parar de verificar após 35 minutos (QR expira em 30)
+      setTimeout(() => clearInterval(pixCheckInterval), 35 * 60 * 1000);
     }
 
     /* ================================================================
