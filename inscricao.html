@@ -964,11 +964,16 @@
         }
       }
 
-      // Verificar pagamento a cada 5 segundos
+      // Verificar pagamento a cada 5 segundos via POST (evita problemas de CORS/redirect com doGet)
       const pixCheckInterval = setInterval(async () => {
         try {
-          const checkResp = await fetch(CONFIG.BACKEND_URL + '?action=check_payment&id=' + result.payment_id);
+          const checkResp = await fetch(CONFIG.BACKEND_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'check_payment', payment_id: result.payment_id }),
+          });
           const checkResult = await checkResp.json();
+          console.log('Pix poll result:', checkResult);
 
           if (checkResult.status === 'approved') {
             clearInterval(pixCheckInterval);

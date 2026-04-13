@@ -29,6 +29,12 @@ const SHEET_NAME   = 'Inscrições'; // Nome da aba
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
+
+    // Ação de verificação de pagamento Pix (polling)
+    if (data.action === 'check_payment' && data.payment_id) {
+      return checkPixPayment(data.payment_id);
+    }
+
     const { paymentData, inscrito, items, total } = data;
 
     // 1. Processar pagamento no Mercado Pago
@@ -99,94 +105,102 @@ function doPost(e) {
 }
 
 /**
- * Permitir CORS preflight
+ * doGet — mantido como fallback e health check
  */
 function doGet(e) {
-  // Verificar status de pagamento Pix
   if (e && e.parameter && e.parameter.action === 'check_payment' && e.parameter.id) {
-    try {
-      const paymentId = e.parameter.id;
-      const url = 'https://api.mercadopago.com/v1/payments/' + paymentId;
-      const options = {
-        method: 'get',
-        headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
-        muteHttpExceptions: true,
-      };
-      const response = UrlFetchApp.fetch(url, options);
-      const result = JSON.parse(response.getContentText());
-
-      // Se pagou, atualizar planilha e enviar email
-      if (result.status === 'approved') {
-        try {
-          const ss = SpreadsheetApp.openById(SHEET_ID);
-          const sheet = ss.getSheetByName(SHEET_NAME);
-          if (sheet) {
-            const data = sheet.getDataRange().getValues();
-            for (let i = data.length - 1; i >= 1; i--) {
-              if (String(data[i][18]) === String(paymentId) && data[i][17] === 'Aguardando Pix') {
-                sheet.getRange(i + 1, 18).setValue('Aprovado');
-                Logger.log('Planilha atualizada para Aprovado: ' + paymentId);
-
-                // Enviar email de confirmação
-                const nome = data[i][1];
-                const email = data[i][2];
-                const ingressosStr = data[i][10];
-                const total = data[i][12];
-
-                // Montar items a partir da string de ingressos
-                const items = [];
-                const totalNum = parseFloat(String(total).replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
-                const partes = ingressosStr.split(', ');
-                partes.forEach(p => {
-                  const match = p.match(/(.+?) ×(\d+)(?: \(R\$ ([\d.,]+)\))?/);
-                  if (match) {
-                    const qty = parseInt(match[2]);
-                    let preco = 0;
-                    if (match[3]) {
-                      const subtotal = parseFloat(match[3].replace('.', '').replace(',', '.'));
-                      preco = qty > 0 ? subtotal / qty : 0;
-                    }
-                    items.push({ tipo: match[1], quantidade: qty, preco: preco });
-                  }
-                });
-                // Fallback: se nenhum preço foi extraído e há apenas 1 item, usar o total
-                if (items.length === 1 && items[0].preco === 0 && totalNum > 0) {
-                  items[0].preco = totalNum / items[0].quantidade;
-                }
-
-                try {
-                  sendConfirmationEmail({ nome: nome, email: email }, items, total, paymentId);
-                  Logger.log('Email Pix enviado para: ' + email);
-                } catch (emailErr) {
-                  Logger.log('Erro email Pix: ' + emailErr.toString());
-                }
-
-                break;
-              }
-            }
-          }
-        } catch (sheetErr) {
-          Logger.log('Erro ao atualizar planilha Pix: ' + sheetErr.toString());
-        }
-      }
-
-      return ContentService.createTextOutput(JSON.stringify({
-        status: result.status,
-        payment_id: paymentId,
-      })).setMimeType(ContentService.MimeType.JSON);
-    } catch (err) {
-      Logger.log('Erro check_payment: ' + err.toString());
-      return ContentService.createTextOutput(JSON.stringify({
-        status: 'error',
-        message: err.toString(),
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
+    return checkPixPayment(e.parameter.id);
   }
 
   return ContentService.createTextOutput(JSON.stringify({
     status: 'ok',
     message: 'Backend do XIII Fórum Científico da EsEFEx ativo.'
   })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Verificar status de pagamento Pix na API do Mercado Pago
+ * Chamado via doPost (polling do frontend) ou doGet (fallback)
+ */
+function checkPixPayment(paymentId) {
+  try {
+    const url = 'https://api.mercadopago.com/v1/payments/' + paymentId;
+    const options = {
+      method: 'get',
+      headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+      muteHttpExceptions: true,
+    };
+    const response = UrlFetchApp.fetch(url, options);
+    const result = JSON.parse(response.getContentText());
+
+    Logger.log('Pix check - payment ' + paymentId + ' status: ' + result.status);
+
+    // Se pagou, atualizar planilha e enviar email
+    if (result.status === 'approved') {
+      try {
+        const ss = SpreadsheetApp.openById(SHEET_ID);
+        const sheet = ss.getSheetByName(SHEET_NAME);
+        if (sheet) {
+          const data = sheet.getDataRange().getValues();
+          for (let i = data.length - 1; i >= 1; i--) {
+            if (String(data[i][18]) === String(paymentId) && data[i][17] === 'Aguardando Pix') {
+              sheet.getRange(i + 1, 18).setValue('Aprovado');
+              Logger.log('Planilha atualizada para Aprovado: ' + paymentId);
+
+              // Enviar email de confirmação
+              const nome = data[i][1];
+              const email = data[i][2];
+              const ingressosStr = data[i][10];
+              const total = data[i][12];
+
+              // Montar items a partir da string de ingressos
+              const items = [];
+              const totalNum = parseFloat(String(total).replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
+              const partes = ingressosStr.split(', ');
+              partes.forEach(p => {
+                const match = p.match(/(.+?) ×(\d+)(?: \(R\$ ([\d.,]+)\))?/);
+                if (match) {
+                  const qty = parseInt(match[2]);
+                  let preco = 0;
+                  if (match[3]) {
+                    const subtotal = parseFloat(match[3].replace('.', '').replace(',', '.'));
+                    preco = qty > 0 ? subtotal / qty : 0;
+                  }
+                  items.push({ tipo: match[1], quantidade: qty, preco: preco });
+                }
+              });
+              // Fallback: se nenhum preço foi extraído e há apenas 1 item, usar o total
+              if (items.length === 1 && items[0].preco === 0 && totalNum > 0) {
+                items[0].preco = totalNum / items[0].quantidade;
+              }
+
+              try {
+                sendConfirmationEmail({ nome: nome, email: email }, items, total, paymentId);
+                Logger.log('Email Pix enviado para: ' + email);
+              } catch (emailErr) {
+                Logger.log('Erro email Pix: ' + emailErr.toString());
+              }
+
+              break;
+            }
+          }
+        }
+      } catch (sheetErr) {
+        Logger.log('Erro ao atualizar planilha Pix: ' + sheetErr.toString());
+      }
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({
+      status: result.status,
+      payment_id: paymentId,
+    })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    Logger.log('Erro checkPixPayment: ' + err.toString());
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: err.toString(),
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 /**
