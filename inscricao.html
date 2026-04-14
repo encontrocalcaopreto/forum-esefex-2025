@@ -123,6 +123,18 @@
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--grad);
     }
+    .ticket-card__image {
+      width: calc(100% + 3rem); margin: -2rem -1.5rem 1.25rem;
+      aspect-ratio: 16 / 10; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: #1a1510;
+    }
+    .ticket-card__image img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform .5s ease;
+    }
+    .ticket-card:hover .ticket-card__image img { transform: scale(1.04); }
+    .ticket-card--premium .ticket-card__image { border-bottom-color: rgba(245,158,11,.25); }
     .ticket-card__badge {
       font-family: var(--font-head); font-size: .7rem; font-weight: 600;
       letter-spacing: .12em; text-transform: uppercase;
@@ -352,6 +364,104 @@
     .pix-modal__timer { color: var(--text-dim); font-size: .8rem; }
     .pix-modal__timer strong { color: var(--fire); }
 
+    /* ── HYROX EIXO ── */
+    .hyrox-eixo {
+      padding: 5rem 0; position: relative;
+      background: linear-gradient(180deg, var(--bg) 0%, #140f08 50%, var(--bg) 100%);
+      border-top: 1px solid rgba(245,158,11,.14);
+      border-bottom: 1px solid rgba(245,158,11,.14);
+      overflow: hidden;
+    }
+    .hyrox-eixo::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--grad);
+    }
+    .hyrox-eixo__label {
+      font-family: var(--font-head); font-size: .75rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--amber); text-align: center; margin-bottom: .75rem;
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+    }
+    .hyrox-eixo__label::before, .hyrox-eixo__label::after {
+      content: ''; width: 40px; height: 1px; background: rgba(245,158,11,.4);
+    }
+    .hyrox-eixo__title {
+      font-family: var(--font-head); font-size: 2.5rem; font-weight: 800;
+      letter-spacing: .02em; text-align: center; margin-bottom: 1rem;
+      background: var(--grad); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hyrox-eixo__sub {
+      color: var(--text-dim); font-size: 1rem; text-align: center;
+      max-width: 700px; margin: 0 auto 3rem; line-height: 1.7;
+    }
+    .hyrox-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem; margin-bottom: 3rem;
+    }
+    .hyrox-grid__item {
+      aspect-ratio: 4 / 3; border-radius: var(--radius-lg);
+      overflow: hidden; border: 1px solid rgba(245,158,11,.2);
+      position: relative;
+    }
+    .hyrox-grid__item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .6s ease;
+    }
+    .hyrox-grid__item:hover img { transform: scale(1.05); }
+
+    .hyrox-coach {
+      display: grid; grid-template-columns: 280px 1fr; gap: 2.5rem;
+      background: var(--bg-card); border: 1px solid rgba(245,158,11,.2);
+      border-radius: var(--radius-lg); padding: 2rem;
+      margin-bottom: 2rem; align-items: center;
+    }
+    .hyrox-coach__photo {
+      aspect-ratio: 1; border-radius: var(--radius-lg);
+      overflow: hidden; border: 2px solid var(--amber);
+    }
+    .hyrox-coach__photo img { width: 100%; height: 100%; object-fit: cover; }
+    .hyrox-coach__label {
+      font-family: var(--font-head); font-size: .7rem; font-weight: 600;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--amber);
+      margin-bottom: .5rem;
+    }
+    .hyrox-coach__name {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+      color: var(--text); margin-bottom: .25rem;
+    }
+    .hyrox-coach__role {
+      color: var(--fire); font-size: .9rem; font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .hyrox-coach__bio {
+      color: var(--text-dim); font-size: .9rem; line-height: 1.7;
+    }
+
+    .hyrox-cta {
+      text-align: center; padding: 2rem;
+      background: linear-gradient(135deg, rgba(255,107,26,.08), rgba(245,158,11,.08));
+      border: 1px solid rgba(245,158,11,.25);
+      border-radius: var(--radius-lg);
+    }
+    .hyrox-cta__text {
+      font-family: var(--font-head); font-size: 1.1rem; font-weight: 600;
+      color: var(--text); margin-bottom: 1rem;
+    }
+    .hyrox-cta__btn {
+      display: inline-block; padding: .8rem 2rem;
+      background: var(--grad); color: #fff;
+      font-family: var(--font-head); font-size: .85rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      border-radius: var(--radius); text-decoration: none;
+      transition: transform var(--trans), box-shadow var(--trans);
+      border: none; cursor: pointer;
+    }
+    .hyrox-cta__btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255,107,26,.4);
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .tickets__grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
@@ -377,6 +487,14 @@
       .pix-modal__code { font-size: .65rem; }
       .pix-modal__code-wrap { flex-direction: column; }
       .pix-modal__copy-btn { width: 100%; text-align: center; }
+      .hyrox-eixo { padding: 3rem 0; }
+      .hyrox-eixo__title { font-size: 1.8rem; }
+      .hyrox-eixo__sub { font-size: .9rem; margin-bottom: 2rem; }
+      .hyrox-grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2rem; }
+      .hyrox-coach { grid-template-columns: 1fr; padding: 1.5rem; gap: 1.5rem; text-align: center; }
+      .hyrox-coach__photo { max-width: 200px; margin: 0 auto; }
+      .hyrox-coach__name { font-size: 1.25rem; }
+      .hyrox-coach__bio { font-size: .85rem; text-align: left; }
     }
 
     @media (max-width: 380px) {
@@ -407,6 +525,53 @@
     </div>
   </header>
 
+  <!-- ── HYROX EXPERIENCE (EIXO) ── -->
+  <section class="hyrox-eixo" id="hyroxExperience">
+    <div class="container">
+      <div class="hyrox-eixo__label">Destaque Exclusivo</div>
+      <h2 class="hyrox-eixo__title">HYROX EXPERIENCE</h2>
+      <p class="hyrox-eixo__sub">
+        Uma vivência inédita no XIII Fórum Científico da EsEFEx: treine no formato HYROX sob a condução do primeiro Performance Coach HYROX do Brasil, em instalações preparadas especialmente para a experiência.
+      </p>
+
+      <div class="hyrox-grid">
+        <div class="hyrox-grid__item">
+          <img src="Documentos/Hyrox Experience/pista.jpeg" alt="Pista do treino Hyrox" loading="lazy" />
+        </div>
+        <div class="hyrox-grid__item">
+          <img src="Documentos/Hyrox Experience/funcional.jpeg" alt="Área funcional para a Hyrox Experience" loading="lazy" />
+        </div>
+        <div class="hyrox-grid__item">
+          <img src="Documentos/Hyrox Experience/IMG_3643.JPEG" alt="Hyrox Experience — treino" loading="lazy" />
+        </div>
+        <div class="hyrox-grid__item">
+          <img src="Documentos/Hyrox Experience/IMG_3646.JPEG" alt="Hyrox Experience — treino" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="hyrox-coach">
+        <div class="hyrox-coach__photo">
+          <img src="Documentos/Hyrox Experience/IMG_3643.JPEG" alt="Prof. Alexandre Gurgel" loading="lazy" />
+        </div>
+        <div>
+          <div class="hyrox-coach__label">Coach Responsável</div>
+          <div class="hyrox-coach__name">Prof. Alexandre Gurgel</div>
+          <div class="hyrox-coach__role">1º Performance Coach HYROX do Brasil · Head de Treinamento da BRUK</div>
+          <p class="hyrox-coach__bio">
+            Professor da pós-graduação em Treinamento de Força da UFRJ e coordenador das pós-graduações em Ciências da Atividade Física e Crosstraining. Mestre em Ciências da Atividade Física e doutorando pela UFRJ, pós-graduado em Treinamento de Força. Com mais de 12 anos formando profissionais de Educação Física, foi selecionado entre os 60 melhores coaches do mundo no Red Bull HYROX Coaches Camp. Atua como gerente do PFT Tour HYROX no Rio de Janeiro e responsável pelo HYROX Training Club BRUK Recreio. Autor de artigos científicos e coautor do livro "Crosstraining".
+          </p>
+        </div>
+      </div>
+
+      <div class="hyrox-cta">
+        <p class="hyrox-cta__text">Vagas limitadas · Inclui camisa exclusiva Hyrox Experience</p>
+        <button type="button" class="hyrox-cta__btn" onclick="document.querySelector('[data-ticket=experience] .qty-plus').click(); document.querySelector('.tickets').scrollIntoView({behavior:'smooth',block:'start'});">
+          Quero o ingresso Experience Hyrox
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- ── HERO ── -->
   <section class="sub-hero">
     <div class="container">
@@ -425,6 +590,9 @@
 
         <!-- BÁSICA -->
         <div class="ticket-card" data-ticket="basica" data-price="50">
+          <div class="ticket-card__image">
+            <img src="Documentos/Imagens/basico.png" alt="Kit Básico" loading="lazy" />
+          </div>
           <span class="ticket-card__badge ticket-card__badge--basic">Básica</span>
           <div class="ticket-card__price">R$ 50<small>,00</small></div>
           <p class="ticket-card__desc">Ingresso com kit essencial do evento.</p>
@@ -445,6 +613,9 @@
 
         <!-- PERSONALIZADA -->
         <div class="ticket-card ticket-card--featured" data-ticket="personalizada" data-price="80">
+          <div class="ticket-card__image">
+            <img src="Documentos/Imagens/especializado.png" alt="Kit Personalizado" loading="lazy" />
+          </div>
           <span class="ticket-card__badge ticket-card__badge--personal">Personalizada</span>
           <div class="ticket-card__price">R$ 80<small>,00</small></div>
           <p class="ticket-card__desc">Kit completo + item exclusivo EsEFEx.</p>
@@ -466,6 +637,9 @@
 
         <!-- EXPERIENCE HYROX -->
         <div class="ticket-card ticket-card--premium" data-ticket="experience" data-price="180">
+          <div class="ticket-card__image">
+            <img src="Documentos/Imagens/hyrox.png" alt="Kit Experience Hyrox" loading="lazy" />
+          </div>
           <span class="ticket-card__badge ticket-card__badge--premium">Experience Hyrox</span>
           <div class="ticket-card__price">R$ 180<small>,00</small></div>
           <p class="ticket-card__desc">Experiência completa + camisa exclusiva Hyrox.</p>

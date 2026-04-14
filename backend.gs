@@ -204,6 +204,121 @@ function checkPixPayment(paymentId) {
 }
 
 /**
+ * UTILITÁRIO MANUAL — Re-verifica TODOS os Pix pendentes na planilha.
+ * Para cada linha com status "Aguardando Pix", consulta o MP e atualiza
+ * se estiver aprovado (inclui envio do email de confirmação).
+ *
+ * COMO USAR: No editor do Apps Script, selecione esta função no dropdown
+ * superior e clique em "Executar". Veja os logs em "Execuções".
+ */
+function reverificarPixPendentes() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    Logger.log('Planilha não encontrada');
+    return;
+  }
+
+  const data = sheet.getDataRange().getValues();
+  let atualizados = 0;
+  let verificados = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    const status = data[i][17];
+    const paymentId = data[i][18];
+    const nome = data[i][1];
+
+    if (status === 'Aguardando Pix' && paymentId) {
+      verificados++;
+      Logger.log('Verificando: ' + nome + ' (ID: ' + paymentId + ')');
+
+      try {
+        const url = 'https://api.mercadopago.com/v1/payments/' + paymentId;
+        const options = {
+          method: 'get',
+          headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+          muteHttpExceptions: true,
+        };
+        const response = UrlFetchApp.fetch(url, options);
+        const result = JSON.parse(response.getContentText());
+
+        Logger.log('  → Status no MP: ' + result.status);
+
+        if (result.status === 'approved') {
+          // Atualiza planilha
+          sheet.getRange(i + 1, 18).setValue('Aprovado');
+          atualizados++;
+
+          // Reconstrói items e envia email
+          const email = data[i][2];
+          const ingressosStr = data[i][10];
+          const total = data[i][12];
+
+          const items = [];
+          const totalNum = parseFloat(String(total).replace('R$', '').replace(/\s/g, '').replace(',', '.')) || 0;
+          const partes = String(ingressosStr).split(', ');
+          partes.forEach(p => {
+            const match = p.match(/(.+?) ×(\d+)(?: \(R\$ ([\d.,]+)\))?/);
+            if (match) {
+              const qty = parseInt(match[2]);
+              let preco = 0;
+              if (match[3]) {
+                const subtotal = parseFloat(match[3].replace('.', '').replace(',', '.'));
+                preco = qty > 0 ? subtotal / qty : 0;
+              }
+              items.push({ tipo: match[1], quantidade: qty, preco: preco });
+            }
+          });
+          if (items.length === 1 && items[0].preco === 0 && totalNum > 0) {
+            items[0].preco = totalNum / items[0].quantidade;
+          }
+
+          try {
+            sendConfirmationEmail({ nome: nome, email: email }, items, total, paymentId);
+            Logger.log('  ✓ Atualizado para Aprovado + email enviado para ' + email);
+          } catch (emailErr) {
+            Logger.log('  ⚠ Atualizado mas falhou email: ' + emailErr.toString());
+          }
+        } else if (result.status === 'cancelled' || result.status === 'rejected' || result.status === 'expired') {
+          sheet.getRange(i + 1, 18).setValue(result.status === 'expired' ? 'Pix Expirado' : 'Pix Cancelado');
+          Logger.log('  → Marcado como ' + result.status);
+        }
+      } catch (err) {
+        Logger.log('  ✗ Erro ao verificar ' + paymentId + ': ' + err.toString());
+      }
+    }
+  }
+
+  Logger.log('=== RESUMO ===');
+  Logger.log('Verificados: ' + verificados);
+  Logger.log('Atualizados para Aprovado: ' + atualizados);
+}
+
+/**
+ * INSTALAR TRIGGER — Executa reverificarPixPendentes a cada 10 minutos.
+ * Rode esta função UMA VEZ no editor do Apps Script para ativar.
+ * Remove triggers antigos da mesma função antes de criar o novo (evita duplicação).
+ */
+function instalarTriggerPix() {
+  // Remove triggers antigos de reverificarPixPendentes
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(t => {
+    if (t.getHandlerFunction() === 'reverificarPixPendentes') {
+      ScriptApp.deleteTrigger(t);
+      Logger.log('Trigger antigo removido');
+    }
+  });
+
+  // Cria novo trigger de 10 em 10 minutos
+  ScriptApp.newTrigger('reverificarPixPendentes')
+    .timeBased()
+    .everyMinutes(10)
+    .create();
+
+  Logger.log('✓ Trigger instalado: reverificarPixPendentes roda a cada 10 minutos');
+}
+
+/**
  * Processar pagamento via API Mercado Pago
  */
 function processPayment(paymentData, inscrito, items, total) {
