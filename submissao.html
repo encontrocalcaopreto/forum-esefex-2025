@@ -477,10 +477,36 @@
     @media (max-width: 700px) {
       .linhas-grid, .datas-grid, .modalidade-grid { grid-template-columns: 1fr; }
       .topbar__back span { display: none; }
-      .action-bar__inner { flex-direction: column; align-items: stretch; }
-      .btn { justify-content: center; }
-      .orientacao-item { flex-direction: column; gap: .3rem; }
-      .orientacao-item__key { min-width: unset; }
+      .topbar__title { font-size: .85rem; }
+      .topbar__title span { font-size: .6rem; }
+      .topbar__logo { height: 28px; }
+      .sub-hero { padding: 2.5rem 0 2rem; }
+      .sub-hero__sub { font-size: .9rem; }
+      .action-bar { padding: 1rem 0; }
+      .action-bar__inner { flex-direction: column; align-items: stretch; gap: .6rem; }
+      .btn { justify-content: center; font-size: .78rem; padding: .7rem 1rem; white-space: normal; }
+      .sub-main { padding: 2rem 0 3rem; }
+      .sub-section { margin-bottom: 2rem; }
+      .sub-section__title { margin-bottom: 1rem; padding-bottom: .5rem; }
+      .linha-card, .modalidade-card { padding: 1.25rem; }
+      .linha-card__title, .modalidade-card__title { font-size: 1rem; }
+      .data-card { padding: 1.25rem; gap: .85rem; }
+      .data-card__icon { width: 38px; height: 38px; }
+      .data-card__date { font-size: 1rem; }
+      .data-card__desc { font-size: .8rem; }
+      .orientacao-item { flex-direction: column; gap: .3rem; padding: .85rem 1rem; font-size: .85rem; }
+      .orientacao-item__key { min-width: unset; font-size: .75rem; }
+      .criterio-item { padding: .8rem 1rem; font-size: .85rem; gap: .75rem; align-items: flex-start; }
+      .criterio-item__num { width: 26px; height: 26px; font-size: .7rem; flex-shrink: 0; }
+    }
+
+    @media (max-width: 400px) {
+      .container { width: calc(100% - 2rem); }
+      .topbar__title span { display: none; }
+      .sub-hero__title { font-size: 1.7rem; }
+      .sub-hero__badge { font-size: .7rem; padding: .25rem .75rem; }
+      .data-card { flex-direction: column; align-items: flex-start; gap: .6rem; }
+      .btn { font-size: .72rem; padding: .65rem .75rem; letter-spacing: .04em; }
     }
   </style>
 </head>

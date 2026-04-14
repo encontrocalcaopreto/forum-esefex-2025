@@ -564,6 +564,8 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   color: var(--text-dim);
   margin-bottom: 1.25rem;
   line-height: 1.8;
+  text-align: justify;
+  hyphens: auto;
 }
 .sobre__text strong { color: var(--fire); font-weight: 600; }
 .sobre__cta {
@@ -914,6 +916,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 }
 .hyrox-destaque__coach-bio {
   color: var(--text-dim); font-size: .92rem; line-height: 1.75;
+  text-align: justify; hyphens: auto;
 }
 .hyrox-destaque__cta {
   text-align: center; padding: 2.25rem;
@@ -938,15 +941,26 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   box-shadow: 0 8px 24px rgba(255,107,26,.4);
 }
 @media (max-width: 768px) {
-  .hyrox-destaque { padding: 3.5rem 0; }
-  .hyrox-destaque__sub { font-size: .95rem; margin-bottom: 2.5rem; }
-  .hyrox-destaque__grid { grid-template-columns: repeat(2, 1fr); gap: .75rem; margin-bottom: 2.5rem; }
-  .hyrox-destaque__coach { grid-template-columns: 1fr; padding: 1.5rem; gap: 1.5rem; text-align: center; }
-  .hyrox-destaque__photo { max-width: 200px; margin: 0 auto; }
-  .hyrox-destaque__coach-name { font-size: 1.3rem; }
-  .hyrox-destaque__coach-bio { font-size: .88rem; text-align: left; }
-  .hyrox-destaque__cta { padding: 1.5rem; }
-  .hyrox-destaque__cta-text { font-size: 1rem; }
+  .hyrox-destaque { padding: 3rem 0; }
+  .hyrox-destaque__label { font-size: .7rem; letter-spacing: .16em; gap: .6rem; }
+  .hyrox-destaque__label::before, .hyrox-destaque__label::after { width: 28px; }
+  .hyrox-destaque__sub { font-size: .92rem; margin-bottom: 2.25rem; line-height: 1.65; }
+  .hyrox-destaque__grid { grid-template-columns: repeat(2, 1fr); gap: .6rem; margin-bottom: 2.25rem; }
+  .hyrox-destaque__item { border-radius: 10px; }
+  .hyrox-destaque__coach { grid-template-columns: 1fr; padding: 1.25rem; gap: 1.25rem; text-align: center; margin-bottom: 1.5rem; }
+  .hyrox-destaque__photo { max-width: 170px; margin: 0 auto; }
+  .hyrox-destaque__coach-name { font-size: 1.25rem; }
+  .hyrox-destaque__coach-role { font-size: .85rem; }
+  .hyrox-destaque__coach-bio { font-size: .86rem; text-align: left; line-height: 1.65; }
+  .hyrox-destaque__cta { padding: 1.5rem 1rem; }
+  .hyrox-destaque__cta-text { font-size: .98rem; }
+  .hyrox-destaque__cta-btn { padding: .8rem 1.25rem; font-size: .8rem; letter-spacing: .08em; width: 100%; max-width: 320px; }
+}
+@media (max-width: 380px) {
+  .hyrox-destaque__title { font-size: 1.55rem; }
+  .hyrox-destaque__label::before, .hyrox-destaque__label::after { width: 16px; }
+  .hyrox-destaque__coach { padding: 1rem; }
+  .hyrox-destaque__coach-bio { font-size: .82rem; }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1518,6 +1532,8 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   font-size: .9rem;
   color: var(--text-dim);
   line-height: 1.75;
+  text-align: justify;
+  hyphens: auto;
 }
 .modal__list {
   list-style: none;
