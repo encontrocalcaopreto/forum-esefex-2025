@@ -1264,6 +1264,11 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   height: auto;
   object-fit: contain;
 }
+.parceiro-card img.parceiro-card__img--zoom {
+  max-width: 260px;
+  max-height: 120px;
+  transform: scale(1.35);
+}
 .parceiro-card__name {
   font-family: var(--font-head);
   font-size: 1.1rem;
