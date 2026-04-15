@@ -342,6 +342,11 @@
       grid-template-columns: 1fr 1fr;
       gap: 1.25rem;
     }
+    .modalidade-grid--single {
+      grid-template-columns: 1fr;
+      max-width: 720px;
+      margin: 0 auto;
+    }
     .modalidade-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -545,7 +550,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download do Template
       </a>
-      <a href="https://docs.google.com/forms" target="_blank" rel="noopener" class="btn btn--ghost">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLScvWvH1U3xk30anKAWsBWaI2UCXc6UsoDewCYJydHFKgRi1DA/viewform" target="_blank" rel="noopener" class="btn btn--ghost">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Submeter Resumo
       </a>
@@ -663,21 +668,7 @@
         <div class="sub-section__label">Modalidades</div>
         <h2 class="sub-section__title">Apresentação de Trabalhos</h2>
         <p style="color:var(--text-dim);font-size:.9rem;margin-bottom:1.25rem;">Somente serão apresentados os resumos aprovados pela comissão científica. Trabalhos não apresentados durante o evento não serão publicados nos anais.</p>
-        <div class="modalidade-grid">
-          <div class="modalidade-card">
-            <div class="modalidade-card__icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            </div>
-            <div class="modalidade-card__title">Apresentação Oral</div>
-            <div class="modalidade-card__body">
-              Os dois melhores trabalhos de cada linha de concentração serão selecionados para apresentação oral. A elaboração dos slides é de responsabilidade do(s) autor(es).
-              <ul>
-                <li>Sem modelo de apresentação obrigatório</li>
-                <li>Deve conter as mesmas seções do resumo</li>
-                <li>Logo do evento obrigatório em todos os slides</li>
-              </ul>
-            </div>
-          </div>
+        <div class="modalidade-grid modalidade-grid--single">
           <div class="modalidade-card">
             <div class="modalidade-card__icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -686,6 +677,7 @@
             <div class="modalidade-card__body">
               A confecção do banner é de responsabilidade do(s) autor(es). Ao menos um autor inscrito deve permanecer no local durante o horário de apresentação.
               <ul>
+                <li>Seguir o formato do <a href="Documentos/template-forum.docx" download style="color:var(--fire);text-decoration:underline;">template do evento</a></li>
                 <li>Dimensões: <strong>120 cm (altura) × 90 cm (largura)</strong></li>
                 <li>Leitura legível a ≈ 1,5 m de distância</li>
                 <li>Parte superior: título, autores, instituição e logo do evento</li>
