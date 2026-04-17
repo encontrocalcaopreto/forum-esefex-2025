@@ -585,7 +585,7 @@ function sendConfirmationEmail(inscrito, items, total, paymentId) {
       <p style="font-size:12px;color:#5a4e42;margin:0;">
         Escola de Educação Física do Exército — Rio de Janeiro, RJ<br>
         <a href="https://forumesefex.com" style="color:#ff6b1a;text-decoration:none;">forumesefex.com</a> ·
-        <a href="mailto:forumesefex@esefex.eb.mil.br" style="color:#ff6b1a;text-decoration:none;">forumesefex@esefex.eb.mil.br</a>
+        <a href="mailto:labio.esefex@gmail.com" style="color:#ff6b1a;text-decoration:none;">labio.esefex@gmail.com</a>
       </p>
     </div>
   </div>`;
@@ -595,6 +595,6 @@ function sendConfirmationEmail(inscrito, items, total, paymentId) {
     subject: 'Inscrição Confirmada — XIII Fórum Científico da EsEFEx',
     htmlBody: htmlBody,
     name: 'XIII Fórum Científico da EsEFEx',
-    replyTo: 'forumesefex@esefex.eb.mil.br',
+    replyTo: 'labio.esefex@gmail.com',
   });
 }
