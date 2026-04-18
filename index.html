@@ -1244,5 +1244,73 @@
   </script>
 
   <script src="js/main.js"></script>
+
+  <!-- Alerta de vagas esgotando -->
+  <style>
+    @keyframes urgenciaPulseIndex { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.02);opacity:.9} }
+    @keyframes urgenciaGlowIndex { 0%,100%{box-shadow:0 0 8px rgba(220,38,38,.2)} 50%{box-shadow:0 0 24px rgba(220,38,38,.5),0 0 48px rgba(255,107,26,.2)} }
+    .urgencia-strip {
+      display:none;
+      align-items:center; justify-content:center; gap:.5rem;
+      padding:.7rem 1.5rem;
+      background:linear-gradient(135deg,rgba(220,38,38,.12),rgba(245,158,11,.12));
+      border:1px solid rgba(220,38,38,.35);
+      border-radius:12px;
+      margin-top:1.2rem;
+      animation: urgenciaPulseIndex 2.5s ease-in-out infinite, urgenciaGlowIndex 2.5s ease-in-out infinite;
+      font-size:.9rem; color:var(--text);
+    }
+    .urgencia-strip strong { color:#f87171; }
+    .urgencia-strip__icon { font-size:1.1rem; }
+    .urgencia-topbar {
+      display:none;
+      position:fixed; top:0; left:0; right:0; z-index:9999;
+      background:linear-gradient(90deg,#dc2626,#f59e0b,#dc2626);
+      background-size:200% 100%;
+      animation: urgenciaSlide 3s linear infinite;
+      text-align:center; padding:.45rem .5rem;
+      font-family:var(--font-head); font-size:.8rem; font-weight:700; color:#fff;
+      letter-spacing:.05em;
+    }
+    @keyframes urgenciaSlide { 0%{background-position:0 0} 100%{background-position:200% 0} }
+    @media(max-width:600px) { .urgencia-strip{font-size:.8rem;padding:.6rem 1rem;} .urgencia-topbar{font-size:.7rem;} }
+  </style>
+  <script>
+  (async function() {
+    try {
+      const BACKEND = 'https://script.google.com/macros/s/AKfycbwIY2clVjTxSiunUJjR65BHWviRvibrSgeC43WelOhS-Mncej9T4S8ZjXnrJMbRe_I7/exec';
+      const resp = await fetch(BACKEND + '?action=vagas');
+      const v = await resp.json();
+      const totalVendidos = (v.basicaPersonalizada?.vendidos||0) + (v.experience?.vendidos||0);
+      const totalLimite = (v.basicaPersonalizada?.limite||150) + (v.experience?.limite||60);
+      const pct = totalVendidos / totalLimite;
+
+      if (pct >= 0.7) {
+        const restantes = totalLimite - totalVendidos;
+
+        // Banner na seção de inscrições
+        const secao = document.getElementById('inscricoes');
+        if (secao) {
+          const inner = secao.querySelector('.inscricoes__inner');
+          if (inner) {
+            const strip = document.createElement('div');
+            strip.className = 'urgencia-strip';
+            strip.style.display = 'flex';
+            strip.innerHTML = '<span class="urgencia-strip__icon">🔥</span><span><strong>Últimas vagas!</strong> Restam apenas ' + restantes + ' ingressos — garanta o seu agora</span><span class="urgencia-strip__icon">🔥</span>';
+            inner.appendChild(strip);
+          }
+        }
+
+        // Topbar fixa
+        const topbar = document.createElement('div');
+        topbar.className = 'urgencia-topbar';
+        topbar.style.display = 'block';
+        topbar.innerHTML = '⚡ VAGAS ESGOTANDO — Apenas ' + restantes + ' ingressos restantes ⚡';
+        document.body.prepend(topbar);
+        document.body.style.paddingTop = '32px';
+      }
+    } catch(e) { console.warn('Vagas check:', e); }
+  })();
+  </script>
 </body>
 </html>

@@ -37,6 +37,15 @@ function doPost(e) {
 
     const { paymentData, inscrito, items, total } = data;
 
+    // 0. Verificar limites de vagas
+    const limiteCheck = verificarLimiteVagas(items);
+    if (!limiteCheck.ok) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'rejected',
+        message: limiteCheck.message,
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     // 1. Processar pagamento no Mercado Pago
     const paymentResult = processPayment(paymentData, inscrito, items, total);
 
@@ -112,9 +121,48 @@ function doGet(e) {
     return checkPixPayment(e.parameter.id);
   }
 
+  if (e && e.parameter && e.parameter.action === 'vagas') {
+    return retornarVagas();
+  }
+
   return ContentService.createTextOutput(JSON.stringify({
     status: 'ok',
     message: 'Backend do XIII Fórum Científico da EsEFEx ativo.'
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Retorna quantidade de vagas restantes para cada categoria
+ */
+function retornarVagas() {
+  const LIMITE_BP = 150;
+  const LIMITE_EXP = 60;
+
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+
+  let vendidosBP = 0;
+  let vendidosExp = 0;
+
+  if (sheet) {
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      const status = data[i][17];
+      if (status === 'Aprovado' || status === 'Aguardando Pix') {
+        const ingressos = String(data[i][10]);
+        const qtd = parseInt(data[i][11]) || 0;
+        if (ingressos.includes('Experience')) {
+          vendidosExp += qtd;
+        } else {
+          vendidosBP += qtd;
+        }
+      }
+    }
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({
+    basicaPersonalizada: { vendidos: vendidosBP, limite: LIMITE_BP, restantes: Math.max(0, LIMITE_BP - vendidosBP) },
+    experience: { vendidos: vendidosExp, limite: LIMITE_EXP, restantes: Math.max(0, LIMITE_EXP - vendidosExp) },
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -292,6 +340,53 @@ function reverificarPixPendentes() {
   Logger.log('=== RESUMO ===');
   Logger.log('Verificados: ' + verificados);
   Logger.log('Atualizados para Aprovado: ' + atualizados);
+}
+
+/**
+ * Verificar se há vagas disponíveis antes de processar pagamento
+ * Básica + Personalizada: 150 vagas | Experience Hyrox: 60 vagas
+ */
+function verificarLimiteVagas(items) {
+  const LIMITE_BP = 150;
+  const LIMITE_EXP = 60;
+
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) return { ok: true };
+
+  const data = sheet.getDataRange().getValues();
+  let vendidosBP = 0;
+  let vendidosExp = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    const status = data[i][17];
+    if (status === 'Aprovado' || status === 'Aguardando Pix') {
+      const ingressos = String(data[i][10]);
+      const qtd = parseInt(data[i][11]) || 0;
+
+      if (ingressos.includes('Experience')) {
+        vendidosExp += qtd;
+      } else {
+        vendidosBP += qtd;
+      }
+    }
+  }
+
+  let pedidoBP = 0;
+  let pedidoExp = 0;
+  items.forEach(item => {
+    if (item.tipo.includes('Experience')) pedidoExp += item.quantidade;
+    else pedidoBP += item.quantidade;
+  });
+
+  if (vendidosBP + pedidoBP > LIMITE_BP) {
+    return { ok: false, message: 'Inscrições Básica/Personalizada esgotadas. Restam ' + (LIMITE_BP - vendidosBP) + ' vagas.' };
+  }
+  if (vendidosExp + pedidoExp > LIMITE_EXP) {
+    return { ok: false, message: 'Inscrições Experience Hyrox esgotadas. Restam ' + (LIMITE_EXP - vendidosExp) + ' vagas.' };
+  }
+
+  return { ok: true };
 }
 
 /**

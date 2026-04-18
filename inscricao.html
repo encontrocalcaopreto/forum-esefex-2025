@@ -519,6 +519,59 @@
       .hyrox-coach { padding: 1rem; }
       .hyrox-coach__bio { font-size: .8rem; }
     }
+
+    /* ── ALERTA DE URGÊNCIA ── */
+    @keyframes urgenciaPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: .85; }
+    }
+    @keyframes urgenciaGlow {
+      0%, 100% { box-shadow: 0 0 8px rgba(220,38,38,.3); }
+      50% { box-shadow: 0 0 20px rgba(220,38,38,.6), 0 0 40px rgba(255,107,26,.3); }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .urgencia-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: linear-gradient(135deg, #dc2626, #f59e0b);
+      color: #fff;
+      font-family: var(--font-head);
+      font-size: .75rem;
+      font-weight: 700;
+      padding: .35rem .75rem;
+      border-radius: 20px;
+      z-index: 5;
+      letter-spacing: .03em;
+      animation: urgenciaPulse 2s ease-in-out infinite;
+    }
+    .urgencia-banner {
+      margin: 0 auto 1.5rem;
+      max-width: 700px;
+      animation: slideDown .5s ease-out, urgenciaGlow 2s ease-in-out infinite;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .urgencia-banner__inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      padding: .9rem 1.5rem;
+      background: linear-gradient(135deg, rgba(220,38,38,.15), rgba(245,158,11,.15));
+      border: 1px solid rgba(220,38,38,.4);
+      border-radius: var(--radius);
+      font-size: .95rem;
+      color: var(--text);
+    }
+    .urgencia-banner__icon { font-size: 1.2rem; }
+    .urgencia-banner__text strong { color: #f87171; }
+    @media (max-width: 480px) {
+      .urgencia-banner__inner { font-size: .85rem; padding: .7rem 1rem; }
+      .urgencia-badge { font-size: .65rem; top: 8px; right: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -609,7 +662,7 @@
             <img src="Documentos/Imagens/basico.png" alt="Kit Básico" loading="lazy" />
           </div>
           <span class="ticket-card__badge ticket-card__badge--basic">Básica</span>
-          <div class="ticket-card__price">R$ 50<small>,00</small></div>
+          <div class="ticket-card__price">R$ 100<small>,00</small></div>
           <p class="ticket-card__desc">Ingresso com Kit do evento.</p>
           <div class="ticket-card__kit">
             <p class="ticket-card__kit-title">Kit incluso</p>
@@ -632,7 +685,7 @@
             <img src="Documentos/Imagens/especializado.png" alt="Kit Personalizado" loading="lazy" />
           </div>
           <span class="ticket-card__badge ticket-card__badge--personal">Personalizada</span>
-          <div class="ticket-card__price">R$ 80<small>,00</small></div>
+          <div class="ticket-card__price">R$ 160<small>,00</small></div>
           <p class="ticket-card__desc">Ingresso com Kit + item exclusivo EsEFEx.</p>
           <div class="ticket-card__kit">
             <p class="ticket-card__kit-title">Kit incluso</p>
@@ -656,7 +709,7 @@
             <img src="Documentos/Imagens/hyrox.png" alt="Kit Experience Hyrox" loading="lazy" />
           </div>
           <span class="ticket-card__badge ticket-card__badge--premium">Experience Hyrox</span>
-          <div class="ticket-card__price">R$ 180<small>,00</small></div>
+          <div class="ticket-card__price">R$ 360<small>,00</small></div>
           <p class="ticket-card__desc">Ingresso com Kit + Experiência completa + camisa exclusiva Hyrox.</p>
           <div class="ticket-card__kit">
             <p class="ticket-card__kit-title">Kit incluso</p>
@@ -825,15 +878,25 @@
     /* ================================================================
        VENDAS — mude para true para abrir as inscrições
     ================================================================ */
-    const VENDAS_ABERTAS = false;
+    const VENDAS_ABERTAS = true;
 
     /* ================================================================
        TICKET DATA
     ================================================================ */
     const TICKETS = {
-      basica:       { name: 'Inscrição Básica',           price: 50 },
-      personalizada:{ name: 'Inscrição Personalizada',    price: 80 },
-      experience:   { name: 'Inscrição Experience Hyrox', price: 180 },
+      basica:       { name: 'Inscrição Básica',           price: 100 },
+      personalizada:{ name: 'Inscrição Personalizada',    price: 160 },
+      experience:   { name: 'Inscrição Experience Hyrox', price: 360 },
+    };
+
+    /* ================================================================
+       LIMITES DE VAGAS
+       - Básica + Personalizada compartilham 150 vagas
+       - Experience Hyrox: 60 vagas
+    ================================================================ */
+    const LIMITS = {
+      basicaPersonalizada: 150,
+      experience: 60,
     };
 
     /* ================================================================
@@ -859,6 +922,76 @@
     const overlay        = document.getElementById('processingOverlay');
 
     /* ================================================================
+       CONSULTAR VAGAS DISPONÍVEIS
+    ================================================================ */
+    async function consultarVagas() {
+      try {
+        const resp = await fetch(CONFIG.BACKEND_URL + '?action=vagas');
+        const vagas = await resp.json();
+
+        if (vagas.basicaPersonalizada && vagas.basicaPersonalizada.restantes <= 0) {
+          bloquearCategoria(['basica', 'personalizada'], 'Inscrições Básica e Personalizada esgotadas');
+        } else if (vagas.basicaPersonalizada) {
+          const pctBP = vagas.basicaPersonalizada.vendidos / vagas.basicaPersonalizada.limite;
+          if (pctBP >= 0.7) mostrarAlertaUrgencia('bp', vagas.basicaPersonalizada.restantes, ['basica', 'personalizada']);
+        }
+        if (vagas.experience && vagas.experience.restantes <= 0) {
+          bloquearCategoria(['experience'], 'Inscrições Experience Hyrox esgotadas');
+        } else if (vagas.experience) {
+          const pctExp = vagas.experience.vendidos / vagas.experience.limite;
+          if (pctExp >= 0.7) mostrarAlertaUrgencia('exp', vagas.experience.restantes, ['experience']);
+        }
+      } catch (err) {
+        console.warn('Não foi possível verificar vagas:', err);
+      }
+    }
+
+    function bloquearCategoria(keys, mensagem) {
+      keys.forEach(key => {
+        const card = document.querySelector('[data-ticket="' + key + '"]');
+        if (!card) return;
+        card.style.opacity = '.5';
+        card.style.pointerEvents = 'none';
+        card.querySelectorAll('.qty-btn').forEach(b => { b.disabled = true; });
+        const badge = document.createElement('div');
+        badge.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(14,12,10,.85);border-radius:var(--radius);z-index:10;';
+        badge.innerHTML = '<div style="text-align:center;padding:1.5rem;"><span style="display:inline-block;background:#dc2626;color:#fff;font-family:var(--font-head);font-weight:700;font-size:1.1rem;padding:.6rem 1.5rem;border-radius:8px;letter-spacing:.05em;">ESGOTADO</span><p style="color:var(--text-dim);font-size:.85rem;margin-top:.5rem;">' + mensagem + '</p></div>';
+        card.style.position = 'relative';
+        card.appendChild(badge);
+      });
+
+      // Se Experience esgotou, desabilitar botão CTA do Hyrox
+      if (keys.includes('experience')) {
+        const btn = document.getElementById('hyroxCtaBtn');
+        if (btn) { btn.disabled = true; btn.style.opacity = '.5'; btn.style.cursor = 'not-allowed'; btn.textContent = 'Experience Hyrox — Esgotado'; }
+      }
+    }
+
+    function mostrarAlertaUrgencia(tipo, restantes, keys) {
+      // Badge pulsante em cada card
+      keys.forEach(key => {
+        const card = document.querySelector('[data-ticket="' + key + '"]');
+        if (!card) return;
+        const tag = document.createElement('div');
+        tag.className = 'urgencia-badge';
+        tag.innerHTML = '🔥 Últimas ' + restantes + ' vagas!';
+        card.style.position = 'relative';
+        card.prepend(tag);
+      });
+
+      // Banner flutuante no topo da seção tickets
+      const banner = document.createElement('div');
+      banner.className = 'urgencia-banner';
+      banner.innerHTML = '<div class="urgencia-banner__inner"><span class="urgencia-banner__icon">⚡</span><span class="urgencia-banner__text"><strong>Corra!</strong> Os ingressos estão esgotando — restam poucas vagas!</span><span class="urgencia-banner__icon">⚡</span></div>';
+      const ticketsSection = document.querySelector('.tickets');
+      if (ticketsSection && !ticketsSection.querySelector('.urgencia-banner')) {
+        ticketsSection.insertBefore(banner, ticketsSection.querySelector('.tickets__grid'));
+      }
+    }
+
+    if (VENDAS_ABERTAS) consultarVagas();
+
+    /* ================================================================
        PAUSA DE VENDAS
     ================================================================ */
     if (!VENDAS_ABERTAS) {
@@ -881,6 +1014,11 @@
       const display = card.querySelector('.qty-value');
 
       plus.addEventListener('click', () => {
+        if (key === 'experience') {
+          if (state.quantities.experience >= LIMITS.experience) return;
+        } else {
+          if (state.quantities.basica + state.quantities.personalizada >= LIMITS.basicaPersonalizada) return;
+        }
         if (state.quantities[key] < 10) {
           state.quantities[key]++;
           display.value = state.quantities[key];
