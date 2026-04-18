@@ -440,6 +440,36 @@
       text-align: justify; hyphens: auto;
     }
 
+    .hyrox-activities { margin-bottom: 2.5rem; }
+    .hyrox-activities__title {
+      font-family: var(--font-head); font-size: 1.3rem; font-weight: 700;
+      color: var(--text); text-align: center; margin-bottom: 1.5rem;
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+    .hyrox-activities__grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem;
+    }
+    .hyrox-activities__card {
+      background: var(--bg-card);
+      border: 1px solid rgba(245,158,11,.18);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+    }
+    .hyrox-activities__card:hover {
+      transform: translateY(-4px);
+      border-color: var(--fire);
+      box-shadow: 0 8px 32px rgba(255,107,26,.15);
+    }
+    .hyrox-activities__name {
+      font-family: var(--font-head); font-size: 1.05rem; font-weight: 700;
+      color: var(--fire); margin-bottom: .5rem;
+    }
+    .hyrox-activities__desc {
+      color: var(--text-dim); font-size: .85rem; line-height: 1.6;
+    }
+
     .hyrox-cta {
       text-align: center; padding: 2rem;
       background: linear-gradient(135deg, rgba(255,107,26,.08), rgba(245,158,11,.08));
@@ -501,6 +531,9 @@
       .hyrox-coach__name { font-size: 1.2rem; }
       .hyrox-coach__role { font-size: .82rem; }
       .hyrox-coach__bio { font-size: .85rem; text-align: left; line-height: 1.65; }
+      .hyrox-activities__grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .hyrox-activities__card { padding: 1.25rem 1rem; }
+      .hyrox-activities__title { font-size: 1.1rem; }
       .hyrox-cta { padding: 1.5rem 1rem; }
       .hyrox-cta__text { font-size: .95rem; }
       .hyrox-cta__btn { padding: .75rem 1.25rem; font-size: .75rem; letter-spacing: .08em; width: 100%; }
@@ -518,6 +551,7 @@
       .hyrox-eixo__label::before, .hyrox-eixo__label::after { width: 16px; }
       .hyrox-coach { padding: 1rem; }
       .hyrox-coach__bio { font-size: .8rem; }
+      .hyrox-activities__grid { grid-template-columns: 1fr; }
     }
 
     /* ── ALERTA DE URGÊNCIA ── */
@@ -613,6 +647,28 @@
         </div>
         <div class="hyrox-grid__item">
           <img src="Documentos/Hyrox Experience/funcional.jpeg" alt="Área funcional para a Hyrox Experience" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="hyrox-activities">
+        <h3 class="hyrox-activities__title">O que te espera</h3>
+        <div class="hyrox-activities__grid">
+          <div class="hyrox-activities__card">
+            <h4 class="hyrox-activities__name">Aula Teórica</h4>
+            <p class="hyrox-activities__desc">Fundamentos, estratégias de prova e periodização para o formato HYROX</p>
+          </div>
+          <div class="hyrox-activities__card">
+            <h4 class="hyrox-activities__name">Prática Controlada</h4>
+            <p class="hyrox-activities__desc">Vivência das estações HYROX com orientação técnica e correções em tempo real</p>
+          </div>
+          <div class="hyrox-activities__card">
+            <h4 class="hyrox-activities__name">Competição HYROX</h4>
+            <p class="hyrox-activities__desc">Simulação competitiva no formato oficial para testar seu desempenho</p>
+          </div>
+          <div class="hyrox-activities__card">
+            <h4 class="hyrox-activities__name">Foto com os Palestrantes</h4>
+            <p class="hyrox-activities__desc">Registro exclusivo com o coach e os palestrantes do XIII Fórum Científico</p>
+          </div>
         </div>
       </div>
 
