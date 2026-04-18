@@ -890,6 +890,41 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 }
 .hyrox-destaque__item:hover img { transform: scale(1.06); }
 
+.hyrox-destaque__activities {
+  margin-bottom: 2.5rem;
+}
+.hyrox-destaque__activities-title {
+  font-family: var(--font-head); font-size: 1.3rem; font-weight: 700;
+  color: var(--text); text-align: center; margin-bottom: 1.5rem;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.hyrox-destaque__activities-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem;
+}
+.hyrox-destaque__activity {
+  background: var(--bg-card);
+  border: 1px solid rgba(245,158,11,.18);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  transition: transform .25s, border-color .25s, box-shadow .25s;
+}
+.hyrox-destaque__activity:hover {
+  transform: translateY(-4px);
+  border-color: var(--fire);
+  box-shadow: 0 8px 32px rgba(255,107,26,.15);
+}
+.hyrox-destaque__activity-icon {
+  display: block; font-size: 2.2rem; margin-bottom: .75rem;
+}
+.hyrox-destaque__activity-name {
+  font-family: var(--font-head); font-size: 1.05rem; font-weight: 700;
+  color: var(--fire); margin-bottom: .5rem;
+}
+.hyrox-destaque__activity-desc {
+  color: var(--text-dim); font-size: .85rem; line-height: 1.6;
+}
+
 .hyrox-destaque__coach {
   display: grid; grid-template-columns: 260px 1fr; gap: 2.5rem;
   background: var(--bg-card); border: 1px solid rgba(245,158,11,.2);
@@ -955,12 +990,16 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   .hyrox-destaque__cta { padding: 1.5rem 1rem; }
   .hyrox-destaque__cta-text { font-size: .98rem; }
   .hyrox-destaque__cta-btn { padding: .8rem 1.25rem; font-size: .8rem; letter-spacing: .08em; width: 100%; max-width: 320px; }
+  .hyrox-destaque__activities-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .hyrox-destaque__activity { padding: 1.25rem 1rem; }
+  .hyrox-destaque__activities-title { font-size: 1.1rem; }
 }
 @media (max-width: 380px) {
   .hyrox-destaque__title { font-size: 1.55rem; }
   .hyrox-destaque__label::before, .hyrox-destaque__label::after { width: 16px; }
   .hyrox-destaque__coach { padding: 1rem; }
   .hyrox-destaque__coach-bio { font-size: .82rem; }
+  .hyrox-destaque__activities-grid { grid-template-columns: 1fr; }
 }
 
 /* ══════════════════════════════════════════════════════════════
