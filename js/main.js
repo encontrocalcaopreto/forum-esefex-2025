@@ -95,10 +95,15 @@
     const diff = TARGET_DATE - Date.now();
 
     if (diff <= 0) {
-      el.days.textContent  = '00';
-      el.hours.textContent = '00';
-      el.mins.textContent  = '00';
-      el.secs.textContent  = '00';
+      const endDate = new Date('2026-06-12T18:00:00');
+      const countdownWrap = el.days.closest('.countdown');
+      if (countdownWrap) {
+        if (Date.now() < endDate.getTime()) {
+          countdownWrap.innerHTML = '<p style="font-size:1.5rem;font-weight:700;color:var(--fire);text-align:center;">🔥 O Fórum está acontecendo agora!</p>';
+        } else {
+          countdownWrap.innerHTML = '<p style="font-size:1.3rem;font-weight:600;color:var(--text-dim);text-align:center;">O XIII Fórum Científico da EsEFEx foi realizado com sucesso!</p>';
+        }
+      }
       return;
     }
 
@@ -267,16 +272,29 @@
   function closeModal() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
-    // Remove any placeholder we inserted
     const placeholder = overlay.querySelector('.modal__photo-placeholder');
     if (placeholder) placeholder.remove();
     photo.style.display = '';
+    if (triggerElement) { triggerElement.focus(); triggerElement = null; }
   }
 
-  // Click on speaker cards
+  let triggerElement = null;
+
   document.querySelectorAll('[data-speaker]').forEach(card => {
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.style.cursor = 'pointer';
+
     card.addEventListener('click', () => {
+      triggerElement = card;
       openModal(card.getAttribute('data-speaker'));
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        triggerElement = card;
+        openModal(card.getAttribute('data-speaker'));
+      }
     });
   });
 

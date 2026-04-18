@@ -731,7 +731,7 @@
       </div>
 
       <!-- ORDER SUMMARY -->
-      <div class="order-summary" id="orderSummary">
+      <div class="order-summary" id="orderSummary" aria-live="polite">
         <h3 class="order-summary__title">Resumo do Pedido</h3>
         <div class="order-summary__items" id="orderItems"></div>
         <div class="order-summary__total">
@@ -803,7 +803,7 @@
           <input type="text" id="curso" name="curso" required placeholder="Ex: Educação Física, Fisioterapia..." />
         </div>
       </form>
-      <div class="msg msg--error" id="formError"></div>
+      <div class="msg msg--error" id="formError" role="alert" aria-live="assertive"></div>
     </div>
   </section>
 
@@ -813,7 +813,7 @@
       <h2 class="payment-section__title">Pagamento</h2>
       <p class="payment-section__sub">Escolha a forma de pagamento. Aceitamos Pix, cartão de crédito e débito.</p>
       <div id="payment-brick-container"></div>
-      <div class="msg msg--error" id="paymentError"></div>
+      <div class="msg msg--error" id="paymentError" role="alert" aria-live="assertive"></div>
     </div>
   </section>
 
@@ -1201,7 +1201,6 @@
       overlay.classList.add('visible');
       hideError(paymentError);
 
-      // Collect form data
       const formData = {
         nome:        document.getElementById('nome').value.trim(),
         email:       document.getElementById('email').value.trim(),
@@ -1214,7 +1213,6 @@
         curso:       document.getElementById('curso').value.trim(),
       };
 
-      // Build items list
       const items = [];
       for (const [key, qty] of Object.entries(state.quantities)) {
         if (qty > 0) {
@@ -1229,15 +1227,19 @@
         total: state.total,
       };
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       try {
         const resp = await fetch(CONFIG.BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify(payload),
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
 
         const result = await resp.json();
-        console.log('Full backend response:', JSON.stringify(result));
 
         if (result.status === 'approved') {
           sessionStorage.setItem('inscricao_data', JSON.stringify({
@@ -1250,21 +1252,22 @@
           window.location.href = 'inscricao-confirmada.html';
 
         } else if (result.status === 'pending_pix' || result.qr_code || result.qr_code_base64) {
-          // Pix: mostrar QR Code na tela
           overlay.classList.remove('visible');
-          console.log('Pix response:', result);
           showPixModal(result);
 
         } else {
           overlay.classList.remove('visible');
           const msg = result.message || 'Pagamento não aprovado. Tente outra forma de pagamento.';
           showError(paymentError, msg);
-          console.log('Payment response:', result);
         }
       } catch (err) {
+        clearTimeout(timeoutId);
         overlay.classList.remove('visible');
-        console.error('Backend error:', err);
-        showError(paymentError, 'Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
+        if (err.name === 'AbortError') {
+          showError(paymentError, 'O servidor demorou para responder. Tente novamente.');
+        } else {
+          showError(paymentError, 'Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
+        }
       }
     }
 
@@ -1309,8 +1312,10 @@
         }
       }
 
-      // Verificar pagamento a cada 5 segundos via POST (evita problemas de CORS/redirect com doGet)
-      const pixCheckInterval = setInterval(async () => {
+      // Verificar pagamento a cada 5 segundos
+      if (state.pixCheckInterval) clearInterval(state.pixCheckInterval);
+
+      state.pixCheckInterval = setInterval(async () => {
         try {
           const checkResp = await fetch(CONFIG.BACKEND_URL, {
             method: 'POST',
@@ -1318,10 +1323,10 @@
             body: JSON.stringify({ action: 'check_payment', payment_id: result.payment_id }),
           });
           const checkResult = await checkResp.json();
-          console.log('Pix poll result:', checkResult);
 
           if (checkResult.status === 'approved') {
-            clearInterval(pixCheckInterval);
+            clearInterval(state.pixCheckInterval);
+            state.pixCheckInterval = null;
 
             sessionStorage.setItem('inscricao_data', JSON.stringify({
               nome: pixFormData.nome,
@@ -1333,13 +1338,24 @@
 
             window.location.href = 'inscricao-confirmada.html';
           }
-        } catch (err) {
-          console.log('Pix check error:', err);
-        }
+        } catch (err) { /* retry silenciosamente */ }
       }, 5000);
 
       // Parar de verificar após 35 minutos (QR expira em 30)
-      setTimeout(() => clearInterval(pixCheckInterval), 35 * 60 * 1000);
+      setTimeout(() => {
+        if (state.pixCheckInterval) {
+          clearInterval(state.pixCheckInterval);
+          state.pixCheckInterval = null;
+        }
+      }, 35 * 60 * 1000);
+
+      // Fechar modal limpa o intervalo
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('visible');
+          if (state.pixCheckInterval) { clearInterval(state.pixCheckInterval); state.pixCheckInterval = null; }
+        }
+      });
     }
 
     /* ================================================================

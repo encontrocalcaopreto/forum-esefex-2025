@@ -251,7 +251,7 @@
       summaryRows.innerHTML = html;
       sessionStorage.removeItem('inscricao_data');
     } else {
-      document.getElementById('confirmSummary').style.display = 'none';
+      document.getElementById('confirmSummary').innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text-dim);"><p>Não encontramos os dados da sua inscrição nesta sessão.</p><p style="margin-top:.5rem;">Verifique seu email — a confirmação foi enviada para o endereço cadastrado.</p><a href="index.html" style="display:inline-block;margin-top:1rem;color:var(--fire);text-decoration:underline;">Voltar ao site</a></div>';
     }
   </script>
 

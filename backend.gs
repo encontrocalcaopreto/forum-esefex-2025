@@ -19,9 +19,51 @@
  */
 
 // ── CONFIGURAÇÃO ──
-const ACCESS_TOKEN = 'APP_USR-1211894729308716-040910-c3e72baa9b946fbb943dc6b3c1599394-1039107041'; // Trocar pelo Access Token real
-const SHEET_ID     = '1Dhj1LvwNzykNN7PSN34m9EQhNl3vXy_aDLqZDIa8elY'; // ID da Google Sheets
-const SHEET_NAME   = 'Inscrições'; // Nome da aba
+// ⚠️ Mova as credenciais para PropertiesService no Apps Script:
+// Apps Script → Configurações → Propriedades do Script → adicionar MP_ACCESS_TOKEN e SHEET_ID
+const ACCESS_TOKEN = PropertiesService.getScriptProperties().getProperty('MP_ACCESS_TOKEN');
+const SHEET_ID     = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+const SHEET_NAME   = 'Inscrições';
+
+// Preços oficiais — NUNCA confiar no frontend
+const PRECOS_SERVIDOR = {
+  'Inscrição Básica': 100,
+  'Inscrição Personalizada': 160,
+  'Inscrição Experience Hyrox': 360,
+};
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function validarCPF(cpf) {
+  cpf = String(cpf).replace(/\D/g, '');
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  for (let t = 9; t < 11; t++) {
+    let d = 0;
+    for (let c = 0; c < t; c++) d += parseInt(cpf.charAt(c)) * ((t + 1) - c);
+    d = ((10 * d) % 11) % 10;
+    if (parseInt(cpf.charAt(t)) !== d) return false;
+  }
+  return true;
+}
+
+function validarPrecos(items) {
+  let totalServidor = 0;
+  for (const item of items) {
+    const precoReal = PRECOS_SERVIDOR[item.tipo];
+    if (!precoReal) return { ok: false, message: 'Tipo de ingresso inválido: ' + item.tipo };
+    if (item.quantidade < 1 || item.quantidade > 10) return { ok: false, message: 'Quantidade inválida' };
+    totalServidor += precoReal * item.quantidade;
+  }
+  return { ok: true, total: totalServidor };
+}
 
 /**
  * Endpoint principal — recebe POST do frontend
@@ -35,15 +77,49 @@ function doPost(e) {
       return checkPixPayment(data.payment_id);
     }
 
-    const { paymentData, inscrito, items, total } = data;
+    const { paymentData, inscrito, items } = data;
 
-    // 0. Verificar limites de vagas
-    const limiteCheck = verificarLimiteVagas(items);
-    if (!limiteCheck.ok) {
+    // 0a. Validar CPF
+    if (!validarCPF(inscrito.cpf)) {
       return ContentService.createTextOutput(JSON.stringify({
         status: 'rejected',
-        message: limiteCheck.message,
+        message: 'CPF inválido.',
       })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 0b. Validar preços no servidor (NUNCA confiar no total do frontend)
+    const precoCheck = validarPrecos(items);
+    if (!precoCheck.ok) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'rejected',
+        message: precoCheck.message,
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    const total = precoCheck.total;
+
+    // 0c. Verificar limites de vagas com lock de concorrência
+    const lock = LockService.getScriptLock();
+    try {
+      lock.waitLock(15000);
+    } catch (lockErr) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'rejected',
+        message: 'Servidor ocupado. Tente novamente em alguns segundos.',
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    try {
+      const limiteCheck = verificarLimiteVagas(items);
+      if (!limiteCheck.ok) {
+        lock.releaseLock();
+        return ContentService.createTextOutput(JSON.stringify({
+          status: 'rejected',
+          message: limiteCheck.message,
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    } catch (limErr) {
+      lock.releaseLock();
+      throw limErr;
     }
 
     // 1. Processar pagamento no Mercado Pago
@@ -56,6 +132,8 @@ function doPost(e) {
         Logger.log('Planilha salva com sucesso');
       } catch (sheetErr) {
         Logger.log('ERRO ao salvar na planilha: ' + sheetErr.toString());
+      } finally {
+        lock.releaseLock();
       }
 
       // 3. Enviar email de confirmação
@@ -80,6 +158,8 @@ function doPost(e) {
         Logger.log('Planilha salva (Pix pendente)');
       } catch (sheetErr) {
         Logger.log('ERRO ao salvar na planilha (Pix): ' + sheetErr.toString());
+      } finally {
+        lock.releaseLock();
       }
 
       const pixData = paymentResult.point_of_interaction || {};
@@ -106,9 +186,10 @@ function doPost(e) {
 
   } catch (err) {
     Logger.log('Erro doPost: ' + err.toString());
+    try { LockService.getScriptLock().releaseLock(); } catch(e) {}
     return ContentService.createTextOutput(JSON.stringify({
       status: 400,
-      message: 'Erro interno: ' + err.toString()
+      message: 'Erro ao processar inscrição. Tente novamente ou entre em contato com labio.esefex@gmail.com'
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
@@ -577,7 +658,7 @@ function saveToSheet(inscrito, items, total, paymentResult, statusOverride) {
  * Enviar email de confirmação para o inscrito
  */
 function sendConfirmationEmail(inscrito, items, total, paymentId) {
-  const firstName = inscrito.nome.split(' ')[0];
+  const firstName = escapeHtml(inscrito.nome.split(' ')[0]);
 
   // Montar lista de ingressos e kits
   let itemsHtml = '';
@@ -592,8 +673,8 @@ function sendConfirmationEmail(inscrito, items, total, paymentId) {
     const kitHtml = kitItems.map(k => '<li style="padding:3px 0;color:#9a8a78;">' + k + '</li>').join('');
     itemsHtml += `
       <tr>
-        <td style="padding:10px 16px;border-bottom:1px solid #2a2015;">${item.tipo}</td>
-        <td style="padding:10px 16px;border-bottom:1px solid #2a2015;text-align:center;">${item.quantidade}</td>
+        <td style="padding:10px 16px;border-bottom:1px solid #2a2015;">${escapeHtml(item.tipo)}</td>
+        <td style="padding:10px 16px;border-bottom:1px solid #2a2015;text-align:center;">${escapeHtml(String(item.quantidade))}</td>
         <td style="padding:10px 16px;border-bottom:1px solid #2a2015;text-align:right;">R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}</td>
       </tr>
       <tr>
