@@ -83,6 +83,7 @@ function checkRateLimit(cpf) {
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
+    Logger.log('doPost recebido: ' + JSON.stringify(data).substring(0, 500));
 
     // Ação de verificação de pagamento Pix (polling)
     if (data.action === 'check_payment' && data.payment_id) {
@@ -90,6 +91,14 @@ function doPost(e) {
     }
 
     const { paymentData, inscrito, items } = data;
+
+    // Validar campos obrigatórios
+    if (!paymentData || !inscrito || !items || !items.length) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'rejected',
+        message: 'Dados incompletos. Preencha todos os campos e tente novamente.',
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
 
     // Rate limiting
     if (inscrito && inscrito.cpf && !checkRateLimit(inscrito.cpf)) {
