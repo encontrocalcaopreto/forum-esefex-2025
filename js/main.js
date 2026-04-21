@@ -220,7 +220,7 @@
     <circle cx="12" cy="7" r="4"/>
   </svg>`;
 
-  function openModal(speakerId) {
+  function openModal(speakerId, eixo) {
     const s = byId[speakerId];
     if (!s) return;
 
@@ -232,7 +232,6 @@
       photo.previousElementSibling && photo.previousElementSibling.remove();
     } else {
       photo.style.display = 'none';
-      // Insert placeholder SVG before photo if not already there
       if (!photo.previousElementSibling || !photo.previousElementSibling.classList.contains('modal__photo-placeholder')) {
         const wrap = photo.parentElement;
         const div = document.createElement('div');
@@ -245,6 +244,12 @@
     name.textContent  = s.name;
     inst.textContent  = s.inst;
     topic.textContent = s.topic;
+
+    if (eixo) {
+      inst.style.color = getComputedStyle(document.documentElement).getPropertyValue('--eixo-' + eixo).trim();
+    } else {
+      inst.style.color = '';
+    }
 
     // Build body HTML
     let html = '';
@@ -285,15 +290,18 @@
     card.setAttribute('tabindex', '0');
     card.style.cursor = 'pointer';
 
+    const grid = card.closest('.speakers-grid[data-eixo]');
+    const eixo = grid ? grid.getAttribute('data-eixo') : null;
+
     card.addEventListener('click', () => {
       triggerElement = card;
-      openModal(card.getAttribute('data-speaker'));
+      openModal(card.getAttribute('data-speaker'), eixo);
     });
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         triggerElement = card;
-        openModal(card.getAttribute('data-speaker'));
+        openModal(card.getAttribute('data-speaker'), eixo);
       }
     });
   });
