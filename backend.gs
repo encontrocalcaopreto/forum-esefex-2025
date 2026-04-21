@@ -339,6 +339,31 @@ function checkPixPayment(paymentId) {
       }
     }
 
+    // Pix expirado/cancelado — atualizar planilha e notificar
+    if (result.status === 'cancelled' || result.status === 'rejected' || result.status === 'expired') {
+      try {
+        const ss = SpreadsheetApp.openById(SHEET_ID);
+        const sheet = ss.getSheetByName(SHEET_NAME);
+        if (sheet) {
+          const data = sheet.getDataRange().getValues();
+          for (let i = data.length - 1; i >= 1; i--) {
+            if (String(data[i][18]) === String(paymentId) && data[i][17] === 'Aguardando Pix') {
+              const statusLabel = result.status === 'expired' ? 'Pix Expirado' : 'Pix Cancelado';
+              sheet.getRange(i + 1, 18).setValue(statusLabel);
+              try {
+                sendPixExpiredEmail({ nome: data[i][1], email: data[i][2] }, paymentId);
+              } catch (emailErr) {
+                Logger.log('Erro email expiração (polling): ' + emailErr.toString());
+              }
+              break;
+            }
+          }
+        }
+      } catch (sheetErr) {
+        Logger.log('Erro ao marcar Pix expirado: ' + sheetErr.toString());
+      }
+    }
+
     return ContentService.createTextOutput(JSON.stringify({
       status: result.status,
       payment_id: paymentId,
@@ -429,8 +454,16 @@ function reverificarPixPendentes() {
             Logger.log('  ⚠ Atualizado mas falhou email: ' + emailErr.toString());
           }
         } else if (result.status === 'cancelled' || result.status === 'rejected' || result.status === 'expired') {
-          sheet.getRange(i + 1, 18).setValue(result.status === 'expired' ? 'Pix Expirado' : 'Pix Cancelado');
+          const statusLabel = result.status === 'expired' ? 'Pix Expirado' : 'Pix Cancelado';
+          sheet.getRange(i + 1, 18).setValue(statusLabel);
           Logger.log('  → Marcado como ' + result.status);
+
+          try {
+            sendPixExpiredEmail({ nome: nome, email: email }, paymentId);
+            Logger.log('  ✉ Email de Pix expirado enviado para ' + email);
+          } catch (emailErr) {
+            Logger.log('  ⚠ Falhou email de expiração: ' + emailErr.toString());
+          }
         }
       } catch (err) {
         Logger.log('  ✗ Erro ao verificar ' + paymentId + ': ' + err.toString());
@@ -789,6 +822,88 @@ function sendConfirmationEmail(inscrito, items, total, paymentId) {
   MailApp.sendEmail({
     to: inscrito.email,
     subject: 'Inscrição Confirmada — XIII Fórum Científico da EsEFEx',
+    htmlBody: htmlBody,
+    name: 'XIII Fórum Científico da EsEFEx',
+    replyTo: 'labio.esefex@gmail.com',
+  });
+}
+
+/**
+ * Enviar email informando que o Pix expirou e a inscrição não foi concluída
+ */
+function sendPixExpiredEmail(inscrito, paymentId) {
+  const firstName = escapeHtml(inscrito.nome.split(' ')[0]);
+
+  const htmlBody = `
+  <div style="max-width:600px;margin:0 auto;font-family:'Segoe UI',Arial,sans-serif;background:#0e0c0a;color:#f0ebe4;border-radius:12px;overflow:hidden;border:1px solid rgba(220,120,20,.2);">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#dc2626 0%,#f59e0b 100%);padding:28px 24px;text-align:center;">
+      <h1 style="margin:0;font-size:22px;color:#fff;font-weight:700;letter-spacing:1px;">Pagamento Pix Expirado</h1>
+      <p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);">XIII Fórum Científico da EsEFEx</p>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:28px 24px;">
+
+      <p style="font-size:16px;margin-bottom:20px;">
+        Olá, <strong>${firstName}</strong>!
+      </p>
+
+      <p style="color:#9a8a78;font-size:14px;line-height:1.7;margin-bottom:24px;">
+        Identificamos que o <strong style="color:#f0ebe4;">QR Code Pix</strong> gerado para sua inscrição no
+        <strong style="color:#f0ebe4;">XIII Fórum Científico da EsEFEx</strong> não foi pago dentro do prazo
+        e <strong style="color:#f87171;">expirou</strong>.
+      </p>
+
+      <!-- Info Box -->
+      <div style="background:#1a1510;border:1px solid rgba(220,38,38,.3);border-radius:10px;padding:18px 20px;margin-bottom:24px;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr>
+            <td style="padding:5px 0;color:#9a8a78;width:130px;">ID do pagamento</td>
+            <td style="padding:5px 0;font-weight:600;color:#f87171;">#${paymentId}</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 0;color:#9a8a78;">Status</td>
+            <td style="padding:5px 0;font-weight:600;color:#f87171;">Expirado / Cancelado</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="color:#9a8a78;font-size:14px;line-height:1.7;margin-bottom:24px;">
+        <strong style="color:#f0ebe4;">Sua inscrição não foi concluída.</strong> O QR Code Pix tem validade de 30 minutos
+        e, após esse período, é automaticamente cancelado por segurança.
+      </p>
+
+      <!-- CTA -->
+      <div style="text-align:center;margin:32px 0 24px;">
+        <a href="https://forumesefex.com/inscricao.html"
+           style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#ff6b1a,#f59e0b);
+                  color:#fff;font-size:15px;font-weight:700;text-decoration:none;border-radius:10px;
+                  letter-spacing:.5px;">
+          Refazer minha inscrição
+        </a>
+      </div>
+
+      <p style="color:#5a4e42;font-size:13px;line-height:1.6;text-align:center;">
+        Caso tenha dúvidas ou acredite que houve um erro, entre em contato conosco pelo email
+        <a href="mailto:labio.esefex@gmail.com" style="color:#ff6b1a;text-decoration:none;">labio.esefex@gmail.com</a>
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#080604;border-top:1px solid rgba(220,120,20,.14);padding:18px 24px;text-align:center;">
+      <p style="font-size:12px;color:#5a4e42;margin:0;">
+        Escola de Educação Física do Exército — Rio de Janeiro, RJ<br>
+        <a href="https://forumesefex.com" style="color:#ff6b1a;text-decoration:none;">forumesefex.com</a> ·
+        <a href="mailto:labio.esefex@gmail.com" style="color:#ff6b1a;text-decoration:none;">labio.esefex@gmail.com</a>
+      </p>
+    </div>
+  </div>`;
+
+  MailApp.sendEmail({
+    to: inscrito.email,
+    subject: 'Pagamento Pix Expirado — XIII Fórum Científico da EsEFEx',
     htmlBody: htmlBody,
     name: 'XIII Fórum Científico da EsEFEx',
     replyTo: 'labio.esefex@gmail.com',
