@@ -467,11 +467,29 @@ function reverificarPixPendentes() {
           sheet.getRange(i + 1, 18).setValue(statusLabel);
           Logger.log('  → Marcado como ' + result.status);
 
+          const emailExp = data[i][2];
           try {
-            sendPixExpiredEmail({ nome: nome, email: email }, paymentId);
-            Logger.log('  ✉ Email de Pix expirado enviado para ' + email);
+            sendPixExpiredEmail({ nome: nome, email: emailExp }, paymentId);
+            Logger.log('  ✉ Email de Pix expirado enviado para ' + emailExp);
           } catch (emailErr) {
             Logger.log('  ⚠ Falhou email de expiração: ' + emailErr.toString());
+          }
+        } else if (result.status === 'pending') {
+          // Se ainda pending mas já passou 35 min, considerar expirado
+          const dataInscricao = new Date(data[i][0]);
+          const agora = new Date();
+          const minutos = (agora - dataInscricao) / 60000;
+          if (minutos > 35) {
+            sheet.getRange(i + 1, 18).setValue('Pix Expirado');
+            Logger.log('  → Expirado por tempo (' + Math.round(minutos) + ' min)');
+
+            const emailExp = data[i][2];
+            try {
+              sendPixExpiredEmail({ nome: nome, email: emailExp }, paymentId);
+              Logger.log('  ✉ Email de Pix expirado enviado para ' + emailExp);
+            } catch (emailErr) {
+              Logger.log('  ⚠ Falhou email de expiração: ' + emailErr.toString());
+            }
           }
         }
       } catch (err) {
@@ -490,6 +508,8 @@ function reverificarPixPendentes() {
  * Básica + Personalizada: 150 vagas | Experience Hyrox: 60 vagas
  */
 function verificarLimiteVagas(items) {
+  if (!items || !items.length) return { ok: true };
+
   const LIMITE_BP = 150;
   const LIMITE_EXP = 60;
 
