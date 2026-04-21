@@ -66,6 +66,18 @@ function validarPrecos(items) {
 }
 
 /**
+ * Rate limiting — máximo 5 requests/minuto por CPF
+ */
+function checkRateLimit(cpf) {
+  const cache = CacheService.getScriptCache();
+  const key = 'rl_' + cpf.replace(/\D/g, '');
+  const current = parseInt(cache.get(key) || '0');
+  if (current >= 5) return false;
+  cache.put(key, String(current + 1), 60);
+  return true;
+}
+
+/**
  * Endpoint principal — recebe POST do frontend
  */
 function doPost(e) {
@@ -78,6 +90,14 @@ function doPost(e) {
     }
 
     const { paymentData, inscrito, items } = data;
+
+    // Rate limiting
+    if (inscrito && inscrito.cpf && !checkRateLimit(inscrito.cpf)) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'rejected',
+        message: 'Muitas tentativas. Aguarde um minuto e tente novamente.',
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
 
     // 0a. Validar CPF
     if (!validarCPF(inscrito.cpf)) {

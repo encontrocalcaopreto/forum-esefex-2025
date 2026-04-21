@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inscrição — XIII Fórum Científico da EsEFEx 2026</title>
   <meta name="description" content="Inscreva-se no XIII Fórum Científico da Escola de Educação Física do Exército — 11 e 12 de junho de 2026, Rio de Janeiro." />
+  <link rel="canonical" href="https://forumesefex.com/inscricao.html" />
   <link rel="icon" type="image/png" href="Logo esefex.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg:          #0e0c0a;
@@ -26,8 +27,8 @@
       --grad:        linear-gradient(135deg,#ff6b1a 0%,#f59e0b 100%);
       --grad-subtle: linear-gradient(135deg,rgba(255,107,26,.08) 0%,rgba(245,158,11,.08) 100%);
       --text:        #f0ebe4;
-      --text-dim:    #9a8a78;
-      --text-muted:  #5a4e42;
+      --text-dim:    #b0a090;
+      --text-muted:  #8a7a6a;
       --font-head:   'Rajdhani', sans-serif;
       --font-body:   'Inter', sans-serif;
       --radius:      10px;
@@ -36,6 +37,13 @@
       --shadow-fire: 0 0 28px rgba(255,107,26,.22);
       --trans:       .25s ease;
     }
+    .skip-link {
+      position:absolute;top:-100%;left:50%;transform:translateX(-50%);
+      background:var(--fire);color:#0e0c0a;padding:.5rem 1.5rem;
+      font-family:var(--font-head);font-weight:700;font-size:.9rem;
+      border-radius:0 0 10px 10px;z-index:99999;text-decoration:none;transition:top .2s;
+    }
+    .skip-link:focus{top:0;}
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -364,6 +372,23 @@
     .pix-modal__copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,107,26,.35); }
     .pix-modal__timer { color: var(--text-dim); font-size: .8rem; }
     .pix-modal__timer strong { color: var(--fire); }
+    .pix-modal__countdown {
+      font-family: var(--font-head); font-size: 1.4rem; font-weight: 700;
+      color: var(--fire); margin-top: .5rem; letter-spacing: .05em;
+    }
+
+    /* ── LGPD ── */
+    .lgpd-check { margin-top: .5rem; }
+    .lgpd-label {
+      display: flex; gap: .75rem; align-items: flex-start;
+      font-size: .85rem; color: var(--text-dim); line-height: 1.5; cursor: pointer;
+    }
+    .lgpd-label input[type="checkbox"] {
+      width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0;
+      accent-color: var(--fire); cursor: pointer;
+    }
+    .lgpd-label a { color: var(--fire); text-decoration: underline; }
+    .lgpd-label a:hover { color: var(--amber); }
 
     /* ── HYROX EIXO ── */
     .hyrox-eixo {
@@ -609,6 +634,7 @@
   </style>
 </head>
 <body>
+  <a href="#hyroxExperience" class="skip-link">Pular para o conteúdo</a>
 
   <!-- ── TOPBAR ── -->
   <header class="topbar">
@@ -858,6 +884,12 @@
           <label for="curso">Curso <span class="req">*</span></label>
           <input type="text" id="curso" name="curso" required placeholder="Ex: Educação Física, Fisioterapia..." />
         </div>
+        <div class="form-group form-group--full lgpd-check">
+          <label class="lgpd-label">
+            <input type="checkbox" id="lgpdConsent" required />
+            <span>Li e aceito a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o tratamento dos meus dados pessoais para fins de inscrição neste evento, conforme a LGPD.</span>
+          </label>
+        </div>
       </form>
       <div class="msg msg--error" id="formError" role="alert" aria-live="assertive"></div>
     </div>
@@ -902,7 +934,8 @@
         <div class="pix-modal__code" id="pixCode"></div>
         <button class="pix-modal__copy-btn" id="pixCopyBtn">Copiar</button>
       </div>
-      <p class="pix-modal__timer">O QR Code expira em <strong>30 minutos</strong></p>
+      <p class="pix-modal__timer">O QR Code expira em:</p>
+      <div class="pix-modal__countdown" id="pixCountdown">30:00</div>
     </div>
   </div>
 
@@ -962,6 +995,8 @@
       quantities: { basica: 0, personalizada: 0, experience: 0 },
       total: 0,
       brickController: null,
+      pixCheckInterval: null,
+      pixCountdownInterval: null,
     };
 
     /* ================================================================
@@ -997,9 +1032,7 @@
           const pctExp = vagas.experience.vendidos / vagas.experience.limite;
           if (pctExp >= 0.7) mostrarAlertaUrgencia('exp', vagas.experience.restantes, ['experience']);
         }
-      } catch (err) {
-        console.warn('Não foi possível verificar vagas:', err);
-      }
+      } catch (err) { /* silently retry on next load */ }
     }
 
     function bloquearCategoria(keys, mensagem) {
@@ -1176,7 +1209,7 @@
     ================================================================ */
     let brickInitializing = false;
 
-    formEl.addEventListener('input', () => {
+    function checkFormAndPayment() {
       const allFilled = formEl.checkValidity();
       const cpfValid = validarCPF(cpfInput.value);
 
@@ -1184,7 +1217,9 @@
         paymentSection.classList.add('visible');
         if (!state.brickController && !brickInitializing) initPaymentBrick();
       }
-    });
+    }
+    formEl.addEventListener('input', checkFormAndPayment);
+    document.getElementById('lgpdConsent').addEventListener('change', checkFormAndPayment);
 
     /* ================================================================
        MERCADO PAGO BRICKS
@@ -1237,13 +1272,12 @@
               await processPayment(cardFormData);
             },
             onError: (error) => {
-              console.error('Brick error:', error);
+              showError(paymentError, 'Erro no pagamento. Tente novamente.');
             },
           },
         });
         state.brickController = controller;
       } catch (err) {
-        console.error('Brick init error:', err);
         showError(paymentError, 'Não foi possível inicializar o pagamento. Recarregue a página.');
       } finally {
         brickInitializing = false;
@@ -1335,24 +1369,38 @@
       const qrImage  = document.getElementById('pixQrImage');
       const pixCode  = document.getElementById('pixCode');
       const copyBtn  = document.getElementById('pixCopyBtn');
+      const countdownEl = document.getElementById('pixCountdown');
 
-      // Exibir QR Code (imagem base64)
       if (result.qr_code_base64) {
         qrImage.src = 'data:image/png;base64,' + result.qr_code_base64;
       }
-
-      // Exibir código Pix Copia e Cola
       if (result.qr_code) {
         pixCode.textContent = result.qr_code;
       }
 
-      // Botão copiar
       copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(result.qr_code || '').then(() => {
           copyBtn.textContent = 'Copiado!';
           setTimeout(() => { copyBtn.textContent = 'Copiar'; }, 2000);
         });
       });
+
+      // Countdown timer (30 minutos)
+      let pixSecsLeft = 30 * 60;
+      if (state.pixCountdownInterval) clearInterval(state.pixCountdownInterval);
+      state.pixCountdownInterval = setInterval(() => {
+        pixSecsLeft--;
+        if (pixSecsLeft <= 0) {
+          clearInterval(state.pixCountdownInterval);
+          state.pixCountdownInterval = null;
+          countdownEl.textContent = 'Expirado';
+          countdownEl.style.color = '#dc2626';
+          return;
+        }
+        const m = Math.floor(pixSecsLeft / 60);
+        const s = pixSecsLeft % 60;
+        countdownEl.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      }, 1000);
 
       modal.classList.add('visible');
 
@@ -1410,6 +1458,7 @@
         if (e.target === modal) {
           modal.classList.remove('visible');
           if (state.pixCheckInterval) { clearInterval(state.pixCheckInterval); state.pixCheckInterval = null; }
+          if (state.pixCountdownInterval) { clearInterval(state.pixCountdownInterval); state.pixCountdownInterval = null; }
         }
       });
     }

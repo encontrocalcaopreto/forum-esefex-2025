@@ -310,4 +310,19 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
   });
+
+  // Focus trap
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Tab' || !overlay.classList.contains('open')) return;
+    const modalBox = document.getElementById('modalBox');
+    const focusable = modalBox.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
 })();
