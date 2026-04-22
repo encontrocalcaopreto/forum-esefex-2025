@@ -229,6 +229,28 @@ function doPost(e) {
       })).setMimeType(ContentService.MimeType.JSON);
 
     } else {
+      // Pagamento rejeitado, cancelado ou status desconhecido — REGISTRAR MESMO ASSIM (auditoria)
+      let statusPlanilha = 'Recusado';
+      if (paymentResult.status === 'cancelled') statusPlanilha = 'Cancelado';
+      else if (paymentResult.status === 'rejected') statusPlanilha = 'Recusado';
+      else if (paymentResult.status) statusPlanilha = 'Recusado — ' + paymentResult.status;
+
+      try {
+        saveToSheet(inscrito, items, total, paymentResult, statusPlanilha);
+        Logger.log('Planilha salva (' + statusPlanilha + '): status_detail=' + (paymentResult.status_detail || 'N/A'));
+      } catch (sheetErr) {
+        Logger.log('ERRO ao salvar na planilha (' + statusPlanilha + '): ' + sheetErr.toString());
+      } finally {
+        lock.releaseLock();
+      }
+
+      try {
+        sendRejectedEmail(inscrito, items, total, paymentResult);
+        Logger.log('Email de recusa enviado');
+      } catch (emailErr) {
+        Logger.log('ERRO ao enviar email de recusa: ' + emailErr.toString());
+      }
+
       return ContentService.createTextOutput(JSON.stringify({
         status: paymentResult.status || 'rejected',
         status_detail: paymentResult.status_detail || '',
@@ -614,6 +636,9 @@ function atualizarResumoVagas() {
 
   let receitaBruta = 0, receitaLiquida = 0;
 
+  // Contadores de tentativas não-concluídas (auditoria)
+  let totalRecusadas = 0, totalCanceladas = 0, totalPixExpirado = 0;
+
   const data = sheetInscr.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     const ingressos = String(data[i][10]);
@@ -652,6 +677,12 @@ function atualizarResumoVagas() {
         receitaBruta += totalBruto;
         receitaLiquida += valorLiquido;
       }
+    } else {
+      // Tentativas não-concluídas (auditoria)
+      const statusStr = String(status);
+      if (statusStr === 'Recusado' || statusStr.indexOf('Recusado') === 0) totalRecusadas++;
+      else if (statusStr === 'Cancelado') totalCanceladas++;
+      else if (statusStr === 'Pix Expirado' || statusStr === 'Pix Cancelado') totalPixExpirado++;
     }
   }
 
@@ -730,6 +761,18 @@ function atualizarResumoVagas() {
     ['Receita Líquida', 'R$ ' + receitaLiquida.toFixed(2).replace('.', ',')],
   ]);
 
+  // Bloco 4: Tentativas não-concluídas (auditoria)
+  resumo.getRange('A21').setValue('TENTATIVAS NÃO CONCLUÍDAS (auditoria)')
+    .setFontWeight('bold').setBackground('#1a1510').setFontColor('#ff6b1a');
+  resumo.getRange('A21:F21').merge();
+
+  resumo.getRange('A22:B22').setValues([['Tipo', 'Quantidade']]).setFontWeight('bold').setBackground('#211a12').setFontColor('#f0ebe4');
+  resumo.getRange('A23:B25').setValues([
+    ['Recusadas (cartão/MP)', totalRecusadas],
+    ['Canceladas',             totalCanceladas],
+    ['Pix Expirados/Cancelados', totalPixExpirado],
+  ]);
+
   // Ajustar largura das colunas
   resumo.setColumnWidth(1, 240);
   resumo.setColumnWidth(2, 140);
@@ -739,6 +782,201 @@ function atualizarResumoVagas() {
   resumo.setColumnWidth(6, 110);
 
   Logger.log('Resumo atualizado: BP ' + totalBPAprovadas + '/' + LIMITE_BP + ' | Exp ' + expAprovada + '/' + LIMITE_EXP);
+}
+
+/**
+ * UTILITÁRIO MANUAL — Recupera inscritos "perdidos" do Mercado Pago e envia
+ * o email apropriado. Busca TODAS as transações recentes na API do MP e,
+ * para cada uma que NÃO está na planilha, adiciona uma linha + envia email.
+ *
+ * Usa o endpoint /v1/payments/search do MP. Busca os últimos 30 dias.
+ *
+ * COMO USAR: Selecione esta função no editor do Apps Script e clique em Executar.
+ */
+function recuperarInscritosPerdidos() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    Logger.log('Aba de inscrições não encontrada');
+    return;
+  }
+
+  // Coletar todos os payment_ids já na planilha
+  const data = sheet.getDataRange().getValues();
+  const idsNaPlanilha = new Set();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][18]) idsNaPlanilha.add(String(data[i][18]));
+  }
+  Logger.log('IDs na planilha: ' + idsNaPlanilha.size);
+
+  // Buscar pagamentos dos últimos 30 dias no MP
+  const dataLimite = new Date();
+  dataLimite.setDate(dataLimite.getDate() - 30);
+  const dataLimiteStr = dataLimite.toISOString();
+
+  let offset = 0;
+  const limit = 50;
+  let totalRecuperados = 0;
+  let totalIgnorados = 0;
+  let totalPaginas = 0;
+
+  while (totalPaginas < 10) { // max 500 pagamentos
+    totalPaginas++;
+    const url = 'https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&range=date_created&begin_date=' +
+                encodeURIComponent(dataLimiteStr) +
+                '&end_date=NOW&limit=' + limit + '&offset=' + offset;
+
+    const options = {
+      method: 'get',
+      headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN },
+      muteHttpExceptions: true,
+    };
+
+    let response, result;
+    try {
+      response = UrlFetchApp.fetch(url, options);
+      result = JSON.parse(response.getContentText());
+    } catch (err) {
+      Logger.log('Erro ao buscar MP: ' + err.toString());
+      break;
+    }
+
+    const results = result.results || [];
+    Logger.log('Página ' + totalPaginas + ': ' + results.length + ' pagamentos');
+
+    if (!results.length) break;
+
+    for (const pay of results) {
+      const paymentId = String(pay.id);
+
+      // Se já está na planilha, pular
+      if (idsNaPlanilha.has(paymentId)) {
+        totalIgnorados++;
+        continue;
+      }
+
+      // FILTRO 1: Só processar pagamentos do Fórum (description contém "EsEFEx")
+      const description = String(pay.description || '');
+      if (!description.includes('EsEFEx') && !description.includes('Fórum Científico')) {
+        totalIgnorados++;
+        continue;
+      }
+
+      // FILTRO 2: Só processar valores múltiplos de ingressos válidos
+      const total = parseFloat(pay.transaction_amount) || 0;
+      const valoresValidos = [];
+      // 1 ingresso: 100, 160, 360 | 2 ingressos: até 720 | combinações até 3 ingressos
+      for (let b = 0; b <= 3; b++) {
+        for (let p = 0; p <= 3; p++) {
+          for (let e = 0; e <= 3; e++) {
+            if (b + p + e === 0) continue;
+            valoresValidos.push(b * 100 + p * 160 + e * 360);
+          }
+        }
+      }
+      if (valoresValidos.indexOf(total) === -1) {
+        totalIgnorados++;
+        Logger.log('Ignorado (valor R$' + total + ' não é de inscrição): ' + paymentId);
+        continue;
+      }
+
+      // FILTRO 3: external_reference deve ser CPF (11 dígitos)
+      const cpf = String(pay.external_reference || '').replace(/\D/g, '');
+      if (cpf.length !== 11) {
+        totalIgnorados++;
+        Logger.log('Ignorado (external_reference não é CPF): ' + paymentId);
+        continue;
+      }
+
+      // Identificar status para decidir o que fazer
+      const status = pay.status;
+      let statusPlanilha = '';
+      if (status === 'approved') statusPlanilha = 'Aprovado';
+      else if (status === 'in_process' || status === 'pending') {
+        if (pay.payment_method_id === 'pix') statusPlanilha = 'Aguardando Pix';
+        else statusPlanilha = 'Em Análise';
+      } else if (status === 'cancelled' || status === 'rejected' || status === 'expired') {
+        totalIgnorados++;
+        continue;
+      } else {
+        totalIgnorados++;
+        continue;
+      }
+
+      // Recuperar dados do pagador
+      const nome = ((pay.payer && pay.payer.first_name) || '') + ' ' + ((pay.payer && pay.payer.last_name) || '');
+      const email = (pay.payer && pay.payer.email) || '';
+
+      // FILTRO 4: email válido
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        totalIgnorados++;
+        Logger.log('Ignorado (email inválido "' + email + '"): ' + paymentId);
+        continue;
+      }
+
+      // Reconstruir items pelo valor (agora garantido que é combinação válida)
+      const items = [];
+      if (total === 100) items.push({ tipo: 'Inscrição Básica', quantidade: 1, preco: 100 });
+      else if (total === 160) items.push({ tipo: 'Inscrição Personalizada', quantidade: 1, preco: 160 });
+      else if (total === 360) items.push({ tipo: 'Inscrição Experience Hyrox', quantidade: 1, preco: 360 });
+      else {
+        // Combinação ou múltiplos — marcar genérico para revisão manual
+        items.push({ tipo: 'Inscrição (múltiplos ingressos — revisar)', quantidade: 1, preco: total });
+      }
+
+      // Montar objeto compatível com saveToSheet
+      const inscritoObj = {
+        nome: nome.trim() || 'Recuperado MP',
+        email: email,
+        cpf: cpf,
+        telefone: '',
+        formacao: '(dados do MP)',
+        vinculo: '(dados do MP)',
+        instituicao: '(dados do MP)',
+        cidade: '(dados do MP)',
+        curso: '(dados do MP)',
+      };
+
+      const paymentResult = {
+        id: paymentId,
+        status: pay.status,
+        payment_method_id: pay.payment_method_id,
+        payment_type_id: pay.payment_type_id,
+        fee_details: pay.fee_details,
+      };
+
+      try {
+        saveToSheet(inscritoObj, items, total, paymentResult, statusPlanilha);
+        idsNaPlanilha.add(paymentId);
+        totalRecuperados++;
+        Logger.log('✓ Recuperado: ' + nome.trim() + ' (' + email + ') | ' + statusPlanilha + ' | R$' + total);
+
+        // Enviar email apropriado
+        try {
+          if (statusPlanilha === 'Aprovado') {
+            sendConfirmationEmail(inscritoObj, items, total, paymentId);
+            Logger.log('  ✉ Email de CONFIRMAÇÃO enviado');
+          } else if (statusPlanilha === 'Em Análise') {
+            sendReviewEmail(inscritoObj, items, total, paymentId);
+            Logger.log('  ✉ Email de ANÁLISE enviado');
+          }
+        } catch (emailErr) {
+          Logger.log('  ⚠ Erro ao enviar email: ' + emailErr.toString());
+        }
+      } catch (err) {
+        Logger.log('  ✗ Erro ao salvar: ' + err.toString());
+      }
+    }
+
+    if (results.length < limit) break;
+    offset += limit;
+  }
+
+  Logger.log('=== RESUMO ===');
+  Logger.log('Recuperados: ' + totalRecuperados);
+  Logger.log('Ignorados (já na planilha ou não elegíveis): ' + totalIgnorados);
+
+  try { atualizarResumoVagas(); } catch (e) { Logger.log('Erro atualizar resumo: ' + e.toString()); }
 }
 
 /**
@@ -1284,6 +1522,104 @@ function sendReviewEmail(inscrito, items, total, paymentId) {
   MailApp.sendEmail({
     to: inscrito.email,
     subject: 'Pagamento em Análise — XIII Fórum Científico da EsEFEx',
+    htmlBody: htmlBody,
+    name: 'XIII Fórum Científico da EsEFEx',
+    replyTo: 'labio.esefex@gmail.com',
+  });
+}
+
+/**
+ * Enviar email informando que o pagamento foi RECUSADO pelo Mercado Pago
+ */
+function sendRejectedEmail(inscrito, items, total, paymentResult) {
+  if (!inscrito || !inscrito.nome || !inscrito.email) {
+    Logger.log('sendRejectedEmail: dados do inscrito ausentes, abortando');
+    return;
+  }
+
+  const firstName = escapeHtml(inscrito.nome.split(' ')[0]);
+  const paymentId = paymentResult && paymentResult.id ? paymentResult.id : '—';
+  const statusDetail = (paymentResult && paymentResult.status_detail) ? paymentResult.status_detail : '';
+  const totalFmt = (typeof total === 'number' ? total : 0).toFixed(2).replace('.', ',');
+
+  // Tradução dos motivos mais comuns do MP
+  const motivos = {
+    'cc_rejected_insufficient_amount': 'Cartão sem limite/saldo suficiente',
+    'cc_rejected_bad_filled_card_number': 'Número do cartão inválido',
+    'cc_rejected_bad_filled_date': 'Data de validade inválida',
+    'cc_rejected_bad_filled_security_code': 'Código de segurança (CVV) inválido',
+    'cc_rejected_bad_filled_other': 'Dados do cartão inválidos',
+    'cc_rejected_high_risk': 'Cartão bloqueado pelo antifraude',
+    'cc_rejected_call_for_authorize': 'Banco emissor precisa autorizar — entre em contato com seu banco',
+    'cc_rejected_card_disabled': 'Cartão desativado',
+    'cc_rejected_duplicated_payment': 'Pagamento duplicado (tentativa repetida)',
+    'cc_rejected_max_attempts': 'Muitas tentativas — aguarde alguns minutos',
+    'cc_rejected_other_reason': 'Pagamento recusado pelo banco emissor',
+    'rejected_by_regulations': 'Recusado por regulamentação',
+    'rejected_by_bank': 'Recusado pelo banco',
+  };
+  const motivoAmigavel = motivos[statusDetail] || 'Pagamento não foi autorizado';
+
+  const htmlBody = `
+  <div style="max-width:600px;margin:0 auto;font-family:'Segoe UI',Arial,sans-serif;background:#0e0c0a;color:#f0ebe4;border-radius:12px;overflow:hidden;border:1px solid rgba(220,120,20,.2);">
+
+    <div style="background:linear-gradient(135deg,#dc2626 0%,#f59e0b 100%);padding:28px 24px;text-align:center;">
+      <h1 style="margin:0;font-size:22px;color:#fff;font-weight:700;letter-spacing:1px;">Pagamento Não Aprovado</h1>
+      <p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);">XIII Fórum Científico da EsEFEx</p>
+    </div>
+
+    <div style="padding:28px 24px;">
+      <p style="font-size:16px;margin-bottom:20px;">Olá, <strong>${firstName}</strong>!</p>
+
+      <p style="color:#b0a090;font-size:14px;line-height:1.7;margin-bottom:20px;">
+        Recebemos sua tentativa de inscrição no <strong style="color:#f0ebe4;">XIII Fórum Científico da EsEFEx</strong>,
+        mas o pagamento <strong style="color:#f87171;">não foi aprovado</strong> pelo Mercado Pago.
+      </p>
+
+      <div style="background:#1a1510;border:1px solid rgba(220,38,38,.3);border-radius:10px;padding:18px 20px;margin-bottom:24px;">
+        <p style="margin:0 0 10px;font-size:14px;color:#f87171;font-weight:700;">Motivo</p>
+        <p style="margin:0;font-size:14px;color:#f0ebe4;line-height:1.6;">${escapeHtml(motivoAmigavel)}</p>
+      </div>
+
+      <div style="background:#1a1510;border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:18px 20px;margin-bottom:24px;">
+        <p style="margin:0 0 10px;font-size:14px;color:#f59e0b;font-weight:700;">Boas notícias</p>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:#b0a090;line-height:1.7;">
+          <li><strong style="color:#f0ebe4;">Nenhum valor foi cobrado</strong> do seu cartão.</li>
+          <li>Se preferir, tente novamente usando <strong style="color:#f0ebe4;">Pix</strong> — aprovação instantânea e sem análise antifraude.</li>
+          <li>Sua inscrição só é confirmada quando o pagamento é aprovado.</li>
+        </ul>
+      </div>
+
+      <div style="background:#1a1510;border:1px solid rgba(220,120,20,.14);border-radius:10px;padding:18px 20px;margin-bottom:24px;font-size:13px;color:#b0a090;">
+        <p style="margin:0 0 8px;"><strong style="color:#f0ebe4;">Detalhes da tentativa:</strong></p>
+        <p style="margin:0;">Valor: <strong style="color:#f0ebe4;">R$ ${totalFmt}</strong></p>
+        <p style="margin:0;">ID do pagamento: <strong style="color:#f0ebe4;">#${paymentId}</strong></p>
+      </div>
+
+      <div style="text-align:center;margin:28px 0 16px;">
+        <a href="https://forumesefex.com/inscricao.html"
+           style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#ff6b1a,#f59e0b);
+                  color:#fff;font-size:15px;font-weight:700;text-decoration:none;border-radius:10px;letter-spacing:.5px;">
+          Refazer Inscrição
+        </a>
+      </div>
+
+      <p style="color:#8a7a6a;font-size:13px;text-align:center;margin:0;">
+        Dúvidas? <a href="mailto:labio.esefex@gmail.com" style="color:#ff6b1a;text-decoration:none;">labio.esefex@gmail.com</a>
+      </p>
+    </div>
+
+    <div style="background:#080604;border-top:1px solid rgba(220,120,20,.14);padding:18px 24px;text-align:center;">
+      <p style="font-size:12px;color:#8a7a6a;margin:0;">
+        Escola de Educação Física do Exército — Rio de Janeiro, RJ<br>
+        <a href="https://forumesefex.com" style="color:#ff6b1a;text-decoration:none;">forumesefex.com</a>
+      </p>
+    </div>
+  </div>`;
+
+  MailApp.sendEmail({
+    to: inscrito.email,
+    subject: 'Pagamento Não Aprovado — XIII Fórum Científico da EsEFEx',
     htmlBody: htmlBody,
     name: 'XIII Fórum Científico da EsEFEx',
     replyTo: 'labio.esefex@gmail.com',

@@ -425,6 +425,35 @@
     }
     .review-modal__close:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245,158,11,.4); }
 
+    /* ── REJECTED MODAL (pagamento recusado) ── */
+    .rejected-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000;
+      align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+    .rejected-modal.visible { display: flex; }
+    .rejected-modal__card { background: var(--bg-card); border: 2px solid #dc2626;
+      border-radius: var(--radius-lg); padding: 2rem 1.75rem; max-width: 520px; width: 100%; text-align: center;
+      box-shadow: 0 8px 40px rgba(220, 38, 38, .25); }
+    .rejected-modal__icon { width: 64px; height: 64px; margin: 0 auto 1rem;
+      background: rgba(220, 38, 38, .15); border: 2px solid #dc2626;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .rejected-modal__icon svg { width: 32px; height: 32px; stroke: #dc2626; }
+    .rejected-modal__title { font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+      color: #ef4444; margin-bottom: .5rem; letter-spacing: .02em; }
+    .rejected-modal__sub { color: var(--text-dim); font-size: .95rem; margin-bottom: 1.5rem; }
+    .rejected-modal__reason { background: rgba(220, 38, 38, .1); border: 1px solid rgba(220, 38, 38, .3);
+      border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem;
+      text-align: left; font-size: .9rem; color: #fca5a5; line-height: 1.5; }
+    .rejected-modal__reason strong { color: #ef4444; }
+    .rejected-modal__info { background: rgba(245, 158, 11, .08); border: 1px solid rgba(245, 158, 11, .25);
+      border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+      text-align: left; font-size: .85rem; color: var(--text); line-height: 1.6; }
+    .rejected-modal__info strong { color: #f59e0b; }
+    .rejected-modal__close { width: 100%; padding: .9rem 1.5rem;
+      background: linear-gradient(135deg, #ff6b1a, #f59e0b);
+      color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 1rem;
+      border: none; border-radius: var(--radius); cursor: pointer; letter-spacing: .05em;
+      transition: all var(--trans); }
+    .rejected-modal__close:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,107,26,.4); }
+
     /* ── LGPD ── */
     .lgpd-check { margin-top: .5rem; }
     .lgpd-label {
@@ -1020,6 +1049,34 @@
     </div>
   </div>
 
+  <!-- ── REJECTED MODAL (pagamento recusado) ── -->
+  <div class="rejected-modal" id="rejectedModal" role="dialog" aria-labelledby="rejectedModalTitle" aria-modal="true">
+    <div class="rejected-modal__card">
+      <div class="rejected-modal__icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="15" y1="9" x2="9" y2="15"/>
+          <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h2 class="rejected-modal__title" id="rejectedModalTitle">Pagamento Não Aprovado</h2>
+      <p class="rejected-modal__sub">O Mercado Pago não aprovou sua transação.</p>
+
+      <div class="rejected-modal__reason" id="rejectedModalReason">
+        <strong>Motivo:</strong> <span id="rejectedReasonText">Pagamento não foi autorizado</span>
+      </div>
+
+      <div class="rejected-modal__info">
+        <p style="margin:0 0 .5rem;"><strong>O que fazer?</strong></p>
+        <p style="margin:0;">• <strong style="color:#22c55e;">Nenhum valor foi cobrado</strong> do seu cartão.<br>
+        • Enviamos um email com os detalhes.<br>
+        • Se preferir, tente novamente usando <strong style="color:#f0ebe4;">Pix</strong> (aprovação instantânea).</p>
+      </div>
+
+      <button class="rejected-modal__close" id="rejectedModalClose">Tentar Novamente</button>
+    </div>
+  </div>
+
   <!-- ── PROCESSING OVERLAY ── -->
   <div class="processing-overlay" id="processingOverlay">
     <div class="spinner"></div>
@@ -1430,6 +1487,10 @@
           overlay.classList.remove('visible');
           showReviewModal();
 
+        } else if (result.status === 'rejected' || result.status === 'cancelled') {
+          overlay.classList.remove('visible');
+          showRejectedModal(result.status_detail || result.message || '');
+
         } else {
           overlay.classList.remove('visible');
           const msg = result.message || 'Pagamento não aprovado. Tente outra forma de pagamento.';
@@ -1563,6 +1624,38 @@
     }
     document.getElementById('reviewModalClose').addEventListener('click', () => {
       const modal = document.getElementById('reviewModal');
+      modal.classList.remove('visible');
+      document.body.style.overflow = '';
+    });
+
+    /* ================================================================
+       REJECTED MODAL (pagamento recusado)
+    ================================================================ */
+    const REJECT_REASONS = {
+      'cc_rejected_insufficient_amount': 'Cartão sem limite/saldo suficiente',
+      'cc_rejected_bad_filled_card_number': 'Número do cartão inválido',
+      'cc_rejected_bad_filled_date': 'Data de validade inválida',
+      'cc_rejected_bad_filled_security_code': 'Código de segurança (CVV) inválido',
+      'cc_rejected_bad_filled_other': 'Dados do cartão inválidos',
+      'cc_rejected_high_risk': 'Cartão bloqueado pelo antifraude do Mercado Pago',
+      'cc_rejected_call_for_authorize': 'Banco emissor precisa autorizar — entre em contato com o seu banco',
+      'cc_rejected_card_disabled': 'Cartão desativado',
+      'cc_rejected_duplicated_payment': 'Pagamento duplicado — aguarde alguns minutos antes de tentar novamente',
+      'cc_rejected_max_attempts': 'Muitas tentativas — aguarde alguns minutos',
+      'cc_rejected_other_reason': 'Pagamento recusado pelo banco emissor',
+      'rejected_by_regulations': 'Recusado por regulamentação',
+      'rejected_by_bank': 'Recusado pelo banco',
+    };
+    function showRejectedModal(statusDetail) {
+      const modal = document.getElementById('rejectedModal');
+      const reasonText = document.getElementById('rejectedReasonText');
+      const motivo = REJECT_REASONS[statusDetail] || 'Pagamento não foi autorizado. Tente outro cartão ou use Pix.';
+      reasonText.textContent = motivo;
+      modal.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+    document.getElementById('rejectedModalClose').addEventListener('click', () => {
+      const modal = document.getElementById('rejectedModal');
       modal.classList.remove('visible');
       document.body.style.overflow = '';
     });
