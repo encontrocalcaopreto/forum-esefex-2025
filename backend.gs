@@ -398,6 +398,10 @@ function checkPixPayment(paymentId) {
       }
     }
 
+    if (result.status === 'approved' || result.status === 'cancelled' || result.status === 'rejected' || result.status === 'expired') {
+      try { atualizarResumoVagas(); } catch (e) { Logger.log('Erro atualizar resumo: ' + e.toString()); }
+    }
+
     return ContentService.createTextOutput(JSON.stringify({
       status: result.status,
       payment_id: paymentId,
@@ -535,6 +539,8 @@ function reverificarPixPendentes() {
   Logger.log('=== RESUMO ===');
   Logger.log('Verificados: ' + verificados);
   Logger.log('Atualizados para Aprovado: ' + atualizados);
+
+  try { atualizarResumoVagas(); } catch (e) { Logger.log('Erro atualizar resumo: ' + e.toString()); }
 }
 
 /**
@@ -584,6 +590,155 @@ function verificarLimiteVagas(items) {
   }
 
   return { ok: true };
+}
+
+/**
+ * Atualiza a aba "Resumo" com contagem de vagas por categoria.
+ * Cria a aba se não existir. Chamada após cada saveToSheet e pode ser executada manualmente.
+ */
+function atualizarResumoVagas() {
+  const LIMITE_BP = 150;
+  const LIMITE_EXP = 60;
+
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheetInscr = ss.getSheetByName(SHEET_NAME);
+  if (!sheetInscr) {
+    Logger.log('Aba de inscrições não encontrada');
+    return;
+  }
+
+  // Contadores por categoria e status
+  let basicaAprovada = 0, basicaAguardando = 0, basicaAnalise = 0;
+  let personAprovada = 0, personAguardando = 0, personAnalise = 0;
+  let expAprovada   = 0, expAguardando   = 0, expAnalise   = 0;
+
+  let receitaBruta = 0, receitaLiquida = 0;
+
+  const data = sheetInscr.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    const ingressos = String(data[i][10]);
+    const qtd = parseInt(data[i][11]) || 0;
+    const totalBruto = parseFloat(data[i][12]) || 0;
+    const valorLiquido = parseFloat(data[i][16]) || 0;
+    const status = data[i][17];
+
+    // Contar por status
+    if (status === 'Aprovado' || status === 'Aguardando Pix' || status === 'Em Análise') {
+      // Parseando cada item da string "Básica ×2 (R$...), Experience ×1 (R$...)"
+      const partes = ingressos.split(', ');
+      partes.forEach(p => {
+        const m = p.match(/(.+?) ×(\d+)/);
+        if (!m) return;
+        const tipo = m[1];
+        const q = parseInt(m[2]) || 0;
+
+        if (tipo.includes('Básica')) {
+          if (status === 'Aprovado') basicaAprovada += q;
+          else if (status === 'Aguardando Pix') basicaAguardando += q;
+          else if (status === 'Em Análise') basicaAnalise += q;
+        } else if (tipo.includes('Personalizada')) {
+          if (status === 'Aprovado') personAprovada += q;
+          else if (status === 'Aguardando Pix') personAguardando += q;
+          else if (status === 'Em Análise') personAnalise += q;
+        } else if (tipo.includes('Experience')) {
+          if (status === 'Aprovado') expAprovada += q;
+          else if (status === 'Aguardando Pix') expAguardando += q;
+          else if (status === 'Em Análise') expAnalise += q;
+        }
+      });
+
+      // Receita apenas de aprovados
+      if (status === 'Aprovado') {
+        receitaBruta += totalBruto;
+        receitaLiquida += valorLiquido;
+      }
+    }
+  }
+
+  const totalBPAprovadas = basicaAprovada + personAprovada;
+  const totalBPPendentes = basicaAguardando + personAguardando + basicaAnalise + personAnalise;
+  const totalExpPendentes = expAguardando + expAnalise;
+  const vagasBPRestantes = LIMITE_BP - totalBPAprovadas - totalBPPendentes;
+  const vagasExpRestantes = LIMITE_EXP - expAprovada - totalExpPendentes;
+  const pctBP = ((totalBPAprovadas + totalBPPendentes) / LIMITE_BP * 100);
+  const pctExp = ((expAprovada + totalExpPendentes) / LIMITE_EXP * 100);
+
+  // Cria/recupera aba Resumo
+  let resumo = ss.getSheetByName('Resumo');
+  if (!resumo) {
+    resumo = ss.insertSheet('Resumo');
+  }
+  resumo.clear();
+
+  const agora = new Date();
+  const dataFormatada = Utilities.formatDate(agora, 'America/Sao_Paulo', 'dd/MM/yyyy HH:mm:ss');
+
+  // Cabeçalho
+  resumo.getRange('A1').setValue('RESUMO DE VAGAS — XIII Fórum Científico da EsEFEx')
+    .setFontSize(14).setFontWeight('bold').setFontColor('#ff6b1a');
+  resumo.getRange('A2').setValue('Última atualização: ' + dataFormatada)
+    .setFontStyle('italic').setFontColor('#666');
+
+  // Bloco 1: Resumo por Categoria
+  resumo.getRange('A4').setValue('VAGAS POR CATEGORIA')
+    .setFontWeight('bold').setBackground('#1a1510').setFontColor('#ff6b1a');
+  resumo.getRange('A4:F4').merge();
+
+  const headers = ['Categoria', 'Limite', 'Aprovadas', 'Aguardando Pix', 'Em Análise', 'Restantes'];
+  resumo.getRange('A5:F5').setValues([headers]).setFontWeight('bold').setBackground('#211a12').setFontColor('#f0ebe4');
+
+  const linhas = [
+    ['Básica (R$ 100)',           '—',        basicaAprovada, basicaAguardando, basicaAnalise, '—'],
+    ['Personalizada (R$ 160)',    '—',        personAprovada, personAguardando, personAnalise, '—'],
+    ['Subtotal Básica + Person.', LIMITE_BP,  totalBPAprovadas, basicaAguardando + personAguardando, basicaAnalise + personAnalise, Math.max(0, vagasBPRestantes)],
+    ['Experience Hyrox (R$ 360)', LIMITE_EXP, expAprovada,    expAguardando,    expAnalise,    Math.max(0, vagasExpRestantes)],
+  ];
+  resumo.getRange(6, 1, linhas.length, 6).setValues(linhas);
+
+  // Destacar linhas de total
+  resumo.getRange('A8:F8').setBackground('#2a1f15').setFontWeight('bold');
+  resumo.getRange('A9:F9').setBackground('#2a1f15').setFontWeight('bold');
+
+  // Bloco 2: Ocupação
+  resumo.getRange('A11').setValue('OCUPAÇÃO (%)')
+    .setFontWeight('bold').setBackground('#1a1510').setFontColor('#ff6b1a');
+  resumo.getRange('A11:F11').merge();
+
+  resumo.getRange('A12:B12').setValues([['Categoria', 'Ocupação']]).setFontWeight('bold').setBackground('#211a12').setFontColor('#f0ebe4');
+  resumo.getRange('A13:B14').setValues([
+    ['Básica + Personalizada', pctBP.toFixed(1) + '%'],
+    ['Experience Hyrox',       pctExp.toFixed(1) + '%'],
+  ]);
+
+  // Alertas visuais
+  if (pctBP >= 100) resumo.getRange('B13').setBackground('#dc2626').setFontColor('#fff');
+  else if (pctBP >= 70) resumo.getRange('B13').setBackground('#f59e0b').setFontColor('#fff');
+  else resumo.getRange('B13').setBackground('#22c55e').setFontColor('#fff');
+
+  if (pctExp >= 100) resumo.getRange('B14').setBackground('#dc2626').setFontColor('#fff');
+  else if (pctExp >= 70) resumo.getRange('B14').setBackground('#f59e0b').setFontColor('#fff');
+  else resumo.getRange('B14').setBackground('#22c55e').setFontColor('#fff');
+
+  // Bloco 3: Receita
+  resumo.getRange('A16').setValue('RECEITA (apenas Aprovadas)')
+    .setFontWeight('bold').setBackground('#1a1510').setFontColor('#ff6b1a');
+  resumo.getRange('A16:F16').merge();
+
+  resumo.getRange('A17:B17').setValues([['Tipo', 'Valor']]).setFontWeight('bold').setBackground('#211a12').setFontColor('#f0ebe4');
+  resumo.getRange('A18:B19').setValues([
+    ['Receita Bruta',   'R$ ' + receitaBruta.toFixed(2).replace('.', ',')],
+    ['Receita Líquida', 'R$ ' + receitaLiquida.toFixed(2).replace('.', ',')],
+  ]);
+
+  // Ajustar largura das colunas
+  resumo.setColumnWidth(1, 240);
+  resumo.setColumnWidth(2, 140);
+  resumo.setColumnWidth(3, 110);
+  resumo.setColumnWidth(4, 130);
+  resumo.setColumnWidth(5, 110);
+  resumo.setColumnWidth(6, 110);
+
+  Logger.log('Resumo atualizado: BP ' + totalBPAprovadas + '/' + LIMITE_BP + ' | Exp ' + expAprovada + '/' + LIMITE_EXP);
 }
 
 /**
@@ -732,19 +887,16 @@ function saveToSheet(inscrito, items, total, paymentResult, statusOverride) {
   else if (metodoPagamento === 'bank_transfer' || paymentResult.payment_method_id === 'pix') formaPgto = 'Pix';
   else if (metodoPagamento === 'account_money') formaPgto = 'Saldo MP';
 
-  // Calcular taxa estimada
+  // Taxas reais do Mercado Pago (confirmadas em produção)
+  // Pix: 0,99% | Cartão Crédito: 4,98% | Cartão Débito: 1,99%
   let taxaPct = 0;
   if (formaPgto === 'Cartão de Crédito') taxaPct = 4.98;
   else if (formaPgto === 'Cartão de Débito') taxaPct = 1.99;
   else if (formaPgto === 'Pix') taxaPct = 0.99;
 
-  // Se o MP retornou fee_details, usar o valor real
-  let taxaReais = total * (taxaPct / 100);
-  if (paymentResult.fee_details && paymentResult.fee_details.length > 0) {
-    taxaReais = paymentResult.fee_details.reduce((sum, f) => sum + (f.amount || 0), 0);
-    taxaPct = (taxaReais / total * 100);
-  }
-
+  // Usar sempre a taxa fixa estimada (mais confiável que fee_details,
+  // que às vezes vem vazio ou incompleto na resposta da API)
+  const taxaReais = total * (taxaPct / 100);
   const valorLiquido = total - taxaReais;
 
   sheet.appendRow([
@@ -768,6 +920,8 @@ function saveToSheet(inscrito, items, total, paymentResult, statusOverride) {
     statusOverride || 'Aprovado',
     paymentResult.id
   ]);
+
+  try { atualizarResumoVagas(); } catch (e) { Logger.log('Erro atualizar resumo: ' + e.toString()); }
 }
 
 /**
