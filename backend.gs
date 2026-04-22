@@ -742,6 +742,69 @@ function atualizarResumoVagas() {
 }
 
 /**
+ * UTILITÁRIO MANUAL — Reprocessa TODAS as linhas existentes da planilha
+ * aplicando as taxas atualizadas.
+ * Pix: 0,99% | Cartão Crédito: 4,98% | Cartão Débito: 1,99%
+ *
+ * COMO USAR: Selecione esta função no editor do Apps Script e clique em Executar.
+ */
+function reprocessarTaxas() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    Logger.log('Aba de inscrições não encontrada');
+    return;
+  }
+
+  const data = sheet.getDataRange().getValues();
+  let atualizados = 0;
+  let ignorados = 0;
+
+  // Colunas (1-based para getRange):
+  // 13 = Total Bruto | 14 = Forma Pgto | 15 = Taxa % | 16 = Taxa R$ | 17 = Valor Líquido
+  for (let i = 1; i < data.length; i++) {
+    const totalBruto = parseFloat(data[i][12]) || 0;
+    const formaPgto = String(data[i][13] || '');
+
+    if (totalBruto <= 0) {
+      ignorados++;
+      Logger.log('Linha ' + (i + 1) + ' ignorada (total zero): ' + data[i][1]);
+      continue;
+    }
+
+    let taxaPct = 0;
+    if (formaPgto === 'Cartão de Crédito') taxaPct = 4.98;
+    else if (formaPgto === 'Cartão de Débito') taxaPct = 1.99;
+    else if (formaPgto === 'Pix') taxaPct = 0.99;
+    else {
+      ignorados++;
+      Logger.log('Linha ' + (i + 1) + ' ignorada (forma pgto: "' + formaPgto + '"): ' + data[i][1]);
+      continue;
+    }
+
+    const taxaReais = Math.round(totalBruto * (taxaPct / 100) * 100) / 100;
+    const valorLiquido = Math.round((totalBruto - taxaReais) * 100) / 100;
+
+    // Atualiza as 3 colunas: Taxa %, Taxa R$, Valor Líquido
+    sheet.getRange(i + 1, 15).setValue(taxaPct);
+    sheet.getRange(i + 1, 16).setValue(taxaReais);
+    sheet.getRange(i + 1, 17).setValue(valorLiquido);
+
+    atualizados++;
+    Logger.log('Linha ' + (i + 1) + ' ' + data[i][1] + ': ' + formaPgto +
+               ' R$' + totalBruto.toFixed(2) + ' → taxa R$' + taxaReais.toFixed(2) +
+               ' | líquido R$' + valorLiquido.toFixed(2));
+  }
+
+  Logger.log('=== RESUMO ===');
+  Logger.log('Linhas atualizadas: ' + atualizados);
+  Logger.log('Linhas ignoradas: ' + ignorados);
+
+  // Atualiza o resumo após reprocessar
+  try { atualizarResumoVagas(); } catch (e) { Logger.log('Erro atualizar resumo: ' + e.toString()); }
+}
+
+/**
  * INSTALAR TRIGGER — Executa reverificarPixPendentes a cada 10 minutos.
  * Rode esta função UMA VEZ no editor do Apps Script para ativar.
  * Remove triggers antigos da mesma função antes de criar o novo (evita duplicação).
