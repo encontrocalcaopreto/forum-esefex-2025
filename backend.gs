@@ -203,6 +203,31 @@ function doPost(e) {
         message: 'Pix gerado! Escaneie o QR Code para pagar.'
       })).setMimeType(ContentService.MimeType.JSON);
 
+    } else if (paymentResult.status === 'in_process' || paymentResult.status === 'pending') {
+      // Cartão em análise manual/antifraude — salvar e avisar o usuário
+      try {
+        saveToSheet(inscrito, items, total, paymentResult, 'Em Análise');
+        Logger.log('Planilha salva (Em Análise)');
+      } catch (sheetErr) {
+        Logger.log('ERRO ao salvar na planilha (Em Análise): ' + sheetErr.toString());
+      } finally {
+        lock.releaseLock();
+      }
+
+      try {
+        sendReviewEmail(inscrito, items, total, paymentResult.id);
+        Logger.log('Email de análise enviado');
+      } catch (emailErr) {
+        Logger.log('ERRO ao enviar email de análise: ' + emailErr.toString());
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'in_process',
+        payment_id: paymentResult.id,
+        status_detail: paymentResult.status_detail || '',
+        message: 'Seu pagamento está em análise pelo Mercado Pago. Você receberá um email de confirmação assim que for aprovado (geralmente em até 2 dias úteis). Não é necessário tentar novamente.'
+      })).setMimeType(ContentService.MimeType.JSON);
+
     } else {
       return ContentService.createTextOutput(JSON.stringify({
         status: paymentResult.status || 'rejected',
@@ -411,7 +436,7 @@ function reverificarPixPendentes() {
     const paymentId = data[i][18];
     const nome = data[i][1];
 
-    if (status === 'Aguardando Pix' && paymentId) {
+    if ((status === 'Aguardando Pix' || status === 'Em Análise') && paymentId) {
       verificados++;
       Logger.log('Verificando: ' + nome + ' (ID: ' + paymentId + ')');
 
@@ -463,25 +488,13 @@ function reverificarPixPendentes() {
             Logger.log('  ⚠ Atualizado mas falhou email: ' + emailErr.toString());
           }
         } else if (result.status === 'cancelled' || result.status === 'rejected' || result.status === 'expired') {
-          const statusLabel = result.status === 'expired' ? 'Pix Expirado' : 'Pix Cancelado';
-          sheet.getRange(i + 1, 18).setValue(statusLabel);
-          Logger.log('  → Marcado como ' + result.status);
-
-          const emailExp = data[i][2];
-          try {
-            sendPixExpiredEmail({ nome: nome, email: emailExp }, paymentId);
-            Logger.log('  ✉ Email de Pix expirado enviado para ' + emailExp);
-          } catch (emailErr) {
-            Logger.log('  ⚠ Falhou email de expiração: ' + emailErr.toString());
-          }
-        } else if (result.status === 'pending') {
-          // Se ainda pending mas já passou 35 min, considerar expirado
-          const dataInscricao = new Date(data[i][0]);
-          const agora = new Date();
-          const minutos = (agora - dataInscricao) / 60000;
-          if (minutos > 35) {
-            sheet.getRange(i + 1, 18).setValue('Pix Expirado');
-            Logger.log('  → Expirado por tempo (' + Math.round(minutos) + ' min)');
+          if (status === 'Em Análise') {
+            sheet.getRange(i + 1, 18).setValue('Recusado');
+            Logger.log('  → Em Análise marcado como Recusado (' + result.status + ')');
+          } else {
+            const statusLabel = result.status === 'expired' ? 'Pix Expirado' : 'Pix Cancelado';
+            sheet.getRange(i + 1, 18).setValue(statusLabel);
+            Logger.log('  → Marcado como ' + result.status);
 
             const emailExp = data[i][2];
             try {
@@ -490,6 +503,27 @@ function reverificarPixPendentes() {
             } catch (emailErr) {
               Logger.log('  ⚠ Falhou email de expiração: ' + emailErr.toString());
             }
+          }
+        } else if (result.status === 'pending' || result.status === 'in_process') {
+          // Pix pendente > 35 min = expirado. Em Análise continua aguardando.
+          if (status === 'Aguardando Pix') {
+            const dataInscricao = new Date(data[i][0]);
+            const agora = new Date();
+            const minutos = (agora - dataInscricao) / 60000;
+            if (minutos > 35) {
+              sheet.getRange(i + 1, 18).setValue('Pix Expirado');
+              Logger.log('  → Expirado por tempo (' + Math.round(minutos) + ' min)');
+
+              const emailExp = data[i][2];
+              try {
+                sendPixExpiredEmail({ nome: nome, email: emailExp }, paymentId);
+                Logger.log('  ✉ Email de Pix expirado enviado para ' + emailExp);
+              } catch (emailErr) {
+                Logger.log('  ⚠ Falhou email de expiração: ' + emailErr.toString());
+              }
+            }
+          } else {
+            Logger.log('  → Em Análise continua aguardando MP');
           }
         }
       } catch (err) {
@@ -851,6 +885,103 @@ function sendConfirmationEmail(inscrito, items, total, paymentId) {
   MailApp.sendEmail({
     to: inscrito.email,
     subject: 'Inscrição Confirmada — XIII Fórum Científico da EsEFEx',
+    htmlBody: htmlBody,
+    name: 'XIII Fórum Científico da EsEFEx',
+    replyTo: 'labio.esefex@gmail.com',
+  });
+}
+
+/**
+ * Enviar email informando que o pagamento está em análise (in_process)
+ */
+function sendReviewEmail(inscrito, items, total, paymentId) {
+  const firstName = escapeHtml(inscrito.nome.split(' ')[0]);
+
+  let itemsHtml = '';
+  items.forEach(item => {
+    itemsHtml += `
+      <tr>
+        <td style="padding:10px 16px;border-bottom:1px solid #2a2015;">${escapeHtml(item.tipo)}</td>
+        <td style="padding:10px 16px;border-bottom:1px solid #2a2015;text-align:center;">${escapeHtml(String(item.quantidade))}</td>
+        <td style="padding:10px 16px;border-bottom:1px solid #2a2015;text-align:right;">R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}</td>
+      </tr>`;
+  });
+
+  const htmlBody = `
+  <div style="max-width:600px;margin:0 auto;font-family:'Segoe UI',Arial,sans-serif;background:#0e0c0a;color:#f0ebe4;border-radius:12px;overflow:hidden;border:1px solid rgba(220,120,20,.2);">
+
+    <div style="background:linear-gradient(135deg,#f59e0b 0%,#ff6b1a 100%);padding:28px 24px;text-align:center;">
+      <h1 style="margin:0;font-size:22px;color:#fff;font-weight:700;letter-spacing:1px;">Pagamento em Análise</h1>
+      <p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.85);">XIII Fórum Científico da EsEFEx</p>
+    </div>
+
+    <div style="padding:28px 24px;">
+      <p style="font-size:16px;margin-bottom:20px;">Olá, <strong>${firstName}</strong>!</p>
+
+      <p style="color:#b0a090;font-size:14px;line-height:1.7;margin-bottom:20px;">
+        Recebemos sua tentativa de inscrição no <strong style="color:#f0ebe4;">XIII Fórum Científico da EsEFEx</strong>.
+        Seu pagamento está atualmente <strong style="color:#f59e0b;">em análise</strong> pelo sistema antifraude do Mercado Pago.
+      </p>
+
+      <div style="background:#1a1510;border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:18px 20px;margin-bottom:24px;">
+        <p style="margin:0 0 10px;font-size:14px;color:#f59e0b;font-weight:700;">O que isso significa?</p>
+        <p style="margin:0;font-size:13px;color:#b0a090;line-height:1.6;">
+          Algumas transações com cartão passam por uma revisão manual do Mercado Pago antes de serem aprovadas.
+          Essa análise geralmente leva <strong style="color:#f0ebe4;">até 2 dias úteis</strong>.
+          Assim que o pagamento for aprovado, você receberá automaticamente o email de confirmação da inscrição.
+        </p>
+      </div>
+
+      <div style="background:#1a1510;border:1px solid rgba(220,82,10,.28);border-radius:10px;padding:18px 20px;margin-bottom:24px;">
+        <p style="margin:0 0 10px;font-size:14px;color:#ff6b1a;font-weight:700;">Importante</p>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:#b0a090;line-height:1.7;">
+          <li><strong style="color:#f0ebe4;">Não é necessário tentar novamente</strong> — isso pode gerar cobranças duplicadas.</li>
+          <li>Caso o pagamento seja recusado pelo MP, o valor é estornado automaticamente no cartão.</li>
+          <li>Se preferir, você pode aguardar a análise ou nos contatar para orientação.</li>
+        </ul>
+      </div>
+
+      <h2 style="font-size:14px;text-transform:uppercase;letter-spacing:2px;color:#b0a090;margin-bottom:12px;">Detalhes da Tentativa</h2>
+
+      <table style="width:100%;border-collapse:collapse;font-size:14px;background:#1a1510;border:1px solid rgba(220,120,20,.14);border-radius:10px;overflow:hidden;">
+        <thead>
+          <tr style="background:#211a12;">
+            <th style="padding:10px 16px;text-align:left;color:#b0a090;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Ingresso</th>
+            <th style="padding:10px 16px;text-align:center;color:#b0a090;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Qtd</th>
+            <th style="padding:10px 16px;text-align:right;color:#b0a090;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+          <tr style="background:#211a12;">
+            <td colspan="2" style="padding:12px 16px;font-weight:700;font-size:15px;">Total</td>
+            <td style="padding:12px 16px;text-align:right;font-weight:700;font-size:15px;color:#f59e0b;">R$ ${total.toFixed(2).replace('.', ',')}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:16px;font-size:13px;color:#8a7a6a;">
+        ID do pagamento: <strong style="color:#b0a090;">#${paymentId}</strong>
+      </p>
+
+      <div style="text-align:center;margin-top:28px;">
+        <p style="font-size:13px;color:#8a7a6a;">
+          Dúvidas? Entre em contato: <a href="mailto:labio.esefex@gmail.com" style="color:#ff6b1a;text-decoration:none;">labio.esefex@gmail.com</a>
+        </p>
+      </div>
+    </div>
+
+    <div style="background:#080604;border-top:1px solid rgba(220,120,20,.14);padding:18px 24px;text-align:center;">
+      <p style="font-size:12px;color:#8a7a6a;margin:0;">
+        Escola de Educação Física do Exército — Rio de Janeiro, RJ<br>
+        <a href="https://forumesefex.com" style="color:#ff6b1a;text-decoration:none;">forumesefex.com</a>
+      </p>
+    </div>
+  </div>`;
+
+  MailApp.sendEmail({
+    to: inscrito.email,
+    subject: 'Pagamento em Análise — XIII Fórum Científico da EsEFEx',
     htmlBody: htmlBody,
     name: 'XIII Fórum Científico da EsEFEx',
     replyTo: 'labio.esefex@gmail.com',

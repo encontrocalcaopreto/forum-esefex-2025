@@ -1345,6 +1345,14 @@
           overlay.classList.remove('visible');
           showPixModal(result);
 
+        } else if (result.status === 'in_process') {
+          overlay.classList.remove('visible');
+          showError(paymentError,
+            'Seu pagamento está em análise pelo Mercado Pago e pode levar até 2 dias úteis para ser aprovado. ' +
+            'Enviamos um email com os detalhes. NÃO tente novamente — isso pode gerar cobranças duplicadas. ' +
+            'Assim que for aprovado, você receberá o email de confirmação da inscrição.'
+          );
+
         } else {
           overlay.classList.remove('visible');
           const msg = result.message || 'Pagamento não aprovado. Tente outra forma de pagamento.';
