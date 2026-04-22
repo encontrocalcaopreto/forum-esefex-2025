@@ -329,6 +329,14 @@ function retornarVagas() {
  */
 function checkPixPayment(paymentId) {
   try {
+    if (!paymentId || paymentId === 'undefined' || paymentId === 'null') {
+      Logger.log('checkPixPayment: paymentId inválido (' + paymentId + '), abortando');
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'error',
+        message: 'ID de pagamento inválido',
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     const url = 'https://api.mercadopago.com/v1/payments/' + paymentId;
     const options = {
       method: 'get',
