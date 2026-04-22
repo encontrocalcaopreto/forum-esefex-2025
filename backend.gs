@@ -988,6 +988,74 @@ function recuperarInscritosPerdidos() {
 }
 
 /**
+ * UTILITÁRIO MANUAL — Reenvia email "Pagamento Não Aprovado" para todas as
+ * linhas com status "Recusado" na planilha (útil para quem não recebeu
+ * porque ficou antes do backend ter a função sendRejectedEmail).
+ *
+ * COMO USAR: Selecione esta função no editor do Apps Script e clique em Executar.
+ */
+function reenviarEmailsRecusa() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    Logger.log('Aba de inscrições não encontrada');
+    return;
+  }
+
+  const data = sheet.getDataRange().getValues();
+  let enviados = 0;
+  let falhas = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    const nome = data[i][1];
+    const email = data[i][2];
+    const ingressosStr = String(data[i][10]);
+    const total = parseFloat(data[i][12]) || 0;
+    const status = String(data[i][17] || '');
+    const paymentId = data[i][18];
+
+    // Aceita "Recusado" e variantes "Recusado — ..."
+    const isRecusado = status === 'Recusado' || status.indexOf('Recusado') === 0;
+    if (!isRecusado || !email || !paymentId) continue;
+
+    // Reconstrói items a partir da string de ingressos
+    const items = [];
+    const partes = ingressosStr.split(', ');
+    partes.forEach(p => {
+      const match = p.match(/(.+?) ×(\d+)(?: \(R\$ ([\d.,]+)\))?/);
+      if (match) {
+        const qty = parseInt(match[2]);
+        let preco = 0;
+        if (match[3]) {
+          const subtotal = parseFloat(match[3].replace('.', '').replace(',', '.'));
+          preco = qty > 0 ? subtotal / qty : 0;
+        }
+        items.push({ tipo: match[1], quantidade: qty, preco: preco });
+      }
+    });
+    if (items.length === 1 && items[0].preco === 0 && total > 0) {
+      items[0].preco = total / items[0].quantidade;
+    }
+    if (!items.length) continue;
+
+    const paymentResult = { id: paymentId, status_detail: '' };
+
+    try {
+      sendRejectedEmail({ nome: nome, email: email }, items, total, paymentResult);
+      enviados++;
+      Logger.log('✓ Email de recusa reenviado para: ' + nome + ' (' + email + ')');
+    } catch (err) {
+      falhas++;
+      Logger.log('✗ Falhou reenvio para ' + nome + ': ' + err.toString());
+    }
+  }
+
+  Logger.log('=== RESUMO ===');
+  Logger.log('Emails reenviados: ' + enviados);
+  Logger.log('Falhas: ' + falhas);
+}
+
+/**
  * UTILITÁRIO MANUAL — Reenvia email "Pagamento em Análise" para todas as
  * linhas com status "Em Análise" na planilha (útil para quem não recebeu
  * porque ficou antes do backend ser atualizado).
