@@ -207,7 +207,7 @@ function doPost(e) {
       // Cartão em análise manual/antifraude — salvar e avisar o usuário
       try {
         saveToSheet(inscrito, items, total, paymentResult, 'Em Análise');
-        Logger.log('Planilha salva (Em Análise)');
+        Logger.log('Planilha salva (Em Análise): status_detail=' + (paymentResult.status_detail || 'N/A'));
       } catch (sheetErr) {
         Logger.log('ERRO ao salvar na planilha (Em Análise): ' + sheetErr.toString());
       } finally {
@@ -739,6 +739,73 @@ function atualizarResumoVagas() {
   resumo.setColumnWidth(6, 110);
 
   Logger.log('Resumo atualizado: BP ' + totalBPAprovadas + '/' + LIMITE_BP + ' | Exp ' + expAprovada + '/' + LIMITE_EXP);
+}
+
+/**
+ * UTILITÁRIO MANUAL — Reenvia email "Pagamento em Análise" para todas as
+ * linhas com status "Em Análise" na planilha (útil para quem não recebeu
+ * porque ficou antes do backend ser atualizado).
+ *
+ * COMO USAR: Selecione esta função no editor do Apps Script e clique em Executar.
+ */
+function reenviarEmailsAnalise() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    Logger.log('Aba de inscrições não encontrada');
+    return;
+  }
+
+  const data = sheet.getDataRange().getValues();
+  let enviados = 0;
+  let falhas = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    const nome = data[i][1];
+    const email = data[i][2];
+    const ingressosStr = String(data[i][10]);
+    const total = parseFloat(data[i][12]) || 0;
+    const status = data[i][17];
+    const paymentId = data[i][18];
+
+    if (status !== 'Em Análise' || !email || !paymentId) continue;
+
+    // Reconstrói items a partir da string de ingressos
+    const items = [];
+    const partes = ingressosStr.split(', ');
+    partes.forEach(p => {
+      const match = p.match(/(.+?) ×(\d+)(?: \(R\$ ([\d.,]+)\))?/);
+      if (match) {
+        const qty = parseInt(match[2]);
+        let preco = 0;
+        if (match[3]) {
+          const subtotal = parseFloat(match[3].replace('.', '').replace(',', '.'));
+          preco = qty > 0 ? subtotal / qty : 0;
+        }
+        items.push({ tipo: match[1], quantidade: qty, preco: preco });
+      }
+    });
+    if (items.length === 1 && items[0].preco === 0 && total > 0) {
+      items[0].preco = total / items[0].quantidade;
+    }
+    if (!items.length) {
+      Logger.log('Linha ' + (i + 1) + ' ignorada (sem itens parseados): ' + nome);
+      continue;
+    }
+
+    try {
+      sendReviewEmail({ nome: nome, email: email }, items, total, paymentId);
+      enviados++;
+      Logger.log('✓ Email de análise reenviado para: ' + nome + ' (' + email + ')');
+    } catch (err) {
+      falhas++;
+      Logger.log('✗ Falhou reenvio para ' + nome + ': ' + err.toString());
+    }
+  }
+
+  Logger.log('=== RESUMO ===');
+  Logger.log('Emails reenviados: ' + enviados);
+  Logger.log('Falhas: ' + falhas);
 }
 
 /**

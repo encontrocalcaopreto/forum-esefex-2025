@@ -377,6 +377,54 @@
       color: var(--fire); margin-top: .5rem; letter-spacing: .05em;
     }
 
+    /* ── REVIEW MODAL (pagamento em análise) ── */
+    .review-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.85); z-index: 10000;
+      align-items: center; justify-content: center; padding: 1rem;
+      backdrop-filter: blur(4px);
+    }
+    .review-modal.visible { display: flex; }
+    .review-modal__card {
+      background: var(--bg-card); border: 2px solid #f59e0b;
+      border-radius: var(--radius-lg); padding: 2rem 1.75rem;
+      max-width: 520px; width: 100%; text-align: center;
+      box-shadow: 0 8px 40px rgba(245, 158, 11, .25);
+    }
+    .review-modal__icon {
+      width: 64px; height: 64px; margin: 0 auto 1rem;
+      background: rgba(245, 158, 11, .15); border: 2px solid #f59e0b;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .review-modal__icon svg { width: 32px; height: 32px; stroke: #f59e0b; }
+    .review-modal__title {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+      color: #f59e0b; margin-bottom: .5rem; letter-spacing: .02em;
+    }
+    .review-modal__sub {
+      color: var(--text-dim); font-size: .95rem; margin-bottom: 1.5rem;
+    }
+    .review-modal__box {
+      background: rgba(245, 158, 11, .08); border: 1px solid rgba(245, 158, 11, .25);
+      border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem;
+      text-align: left; font-size: .88rem; color: var(--text); line-height: 1.6;
+    }
+    .review-modal__box strong { color: #f59e0b; }
+    .review-modal__warning {
+      background: rgba(220, 38, 38, .1); border: 1px solid rgba(220, 38, 38, .3);
+      border-radius: var(--radius); padding: .9rem 1.25rem; margin-bottom: 1.25rem;
+      text-align: left; font-size: .85rem; color: #fca5a5; line-height: 1.5;
+    }
+    .review-modal__warning strong { color: #ef4444; }
+    .review-modal__close {
+      width: 100%; padding: .9rem 1.5rem;
+      background: linear-gradient(135deg, #f59e0b, #ff6b1a);
+      color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 1rem;
+      border: none; border-radius: var(--radius); cursor: pointer; letter-spacing: .05em;
+      transition: all var(--trans);
+    }
+    .review-modal__close:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245,158,11,.4); }
+
     /* ── LGPD ── */
     .lgpd-check { margin-top: .5rem; }
     .lgpd-label {
@@ -939,6 +987,39 @@
     </div>
   </div>
 
+  <!-- ── REVIEW MODAL (pagamento em análise antifraude) ── -->
+  <div class="review-modal" id="reviewModal" role="dialog" aria-labelledby="reviewModalTitle" aria-modal="true">
+    <div class="review-modal__card">
+      <div class="review-modal__icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="6" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h2 class="review-modal__title" id="reviewModalTitle">Pagamento em Análise</h2>
+      <p class="review-modal__sub">Seu pagamento foi recebido, mas precisa ser revisado pelo Mercado Pago.</p>
+
+      <div class="review-modal__box">
+        <p style="margin-bottom:.6rem;"><strong>O que está acontecendo?</strong></p>
+        <p>O sistema antifraude do Mercado Pago está analisando sua transação. Isso é um procedimento padrão de segurança e pode levar até <strong>2 dias úteis</strong>.</p>
+      </div>
+
+      <div class="review-modal__box">
+        <p style="margin-bottom:.6rem;"><strong>O que fazer agora?</strong></p>
+        <p>• Você receberá um email assim que o pagamento for <strong>aprovado</strong>.<br>
+           • Se for recusado, o valor é estornado automaticamente no seu cartão.<br>
+           • <strong>Enviamos um email</strong> com todos os detalhes da sua tentativa.</p>
+      </div>
+
+      <div class="review-modal__warning">
+        <p><strong>⚠ NÃO tente pagar novamente</strong> com este cartão — isso pode gerar cobranças duplicadas. Se preferir garantir a inscrição imediatamente, escolha <strong>Pix</strong> (aprovação instantânea, sem análise antifraude).</p>
+      </div>
+
+      <button class="review-modal__close" id="reviewModalClose">Entendi</button>
+    </div>
+  </div>
+
   <!-- ── PROCESSING OVERLAY ── -->
   <div class="processing-overlay" id="processingOverlay">
     <div class="spinner"></div>
@@ -1347,11 +1428,7 @@
 
         } else if (result.status === 'in_process') {
           overlay.classList.remove('visible');
-          showError(paymentError,
-            'Seu pagamento está em análise pelo Mercado Pago e pode levar até 2 dias úteis para ser aprovado. ' +
-            'Enviamos um email com os detalhes. NÃO tente novamente — isso pode gerar cobranças duplicadas. ' +
-            'Assim que for aprovado, você receberá o email de confirmação da inscrição.'
-          );
+          showReviewModal();
 
         } else {
           overlay.classList.remove('visible');
@@ -1475,6 +1552,20 @@
        HELPERS
     ================================================================ */
     function showError(el, msg) { el.textContent = msg; el.classList.add('visible'); }
+
+    /* ================================================================
+       REVIEW MODAL (pagamento em análise antifraude)
+    ================================================================ */
+    function showReviewModal() {
+      const modal = document.getElementById('reviewModal');
+      modal.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+    document.getElementById('reviewModalClose').addEventListener('click', () => {
+      const modal = document.getElementById('reviewModal');
+      modal.classList.remove('visible');
+      document.body.style.overflow = '';
+    });
     function hideError(el) { el.textContent = ''; el.classList.remove('visible'); }
   </script>
 
