@@ -774,6 +774,15 @@ function saveToSheet(inscrito, items, total, paymentResult, statusOverride) {
  * Enviar email de confirmação para o inscrito
  */
 function sendConfirmationEmail(inscrito, items, total, paymentId) {
+  if (!inscrito || !inscrito.nome || !inscrito.email) {
+    Logger.log('sendConfirmationEmail: dados do inscrito ausentes, abortando');
+    return;
+  }
+  if (!items || !items.length) {
+    Logger.log('sendConfirmationEmail: items ausentes, abortando');
+    return;
+  }
+
   const firstName = escapeHtml(inscrito.nome.split(' ')[0]);
 
   // Montar lista de ingressos e kits
@@ -895,6 +904,15 @@ function sendConfirmationEmail(inscrito, items, total, paymentId) {
  * Enviar email informando que o pagamento está em análise (in_process)
  */
 function sendReviewEmail(inscrito, items, total, paymentId) {
+  if (!inscrito || !inscrito.nome || !inscrito.email) {
+    Logger.log('sendReviewEmail: dados do inscrito ausentes, abortando');
+    return;
+  }
+  if (!items || !items.length) {
+    Logger.log('sendReviewEmail: items ausentes, abortando');
+    return;
+  }
+
   const firstName = escapeHtml(inscrito.nome.split(' ')[0]);
 
   let itemsHtml = '';
@@ -992,6 +1010,11 @@ function sendReviewEmail(inscrito, items, total, paymentId) {
  * Enviar email informando que o Pix expirou e a inscrição não foi concluída
  */
 function sendPixExpiredEmail(inscrito, paymentId) {
+  if (!inscrito || !inscrito.nome || !inscrito.email) {
+    Logger.log('sendPixExpiredEmail: dados do inscrito ausentes, abortando');
+    return;
+  }
+
   const firstName = escapeHtml(inscrito.nome.split(' ')[0]);
 
   const htmlBody = `
